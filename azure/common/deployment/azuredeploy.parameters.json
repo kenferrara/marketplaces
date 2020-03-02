@@ -6,13 +6,13 @@
       "value": "westeurope"
     },
     "subnetName": {
-      "value": "orion-snet"
+      "value": "snet-test"
     },
     "virtualNetworkNewOrExisting": {
       "value": "new"
     },
     "virtualNetworkName": {
-      "value": "orion-vnet"
+      "value": "vnet-test"
     },
     "addressPrefixes": {
       "value": [
@@ -26,7 +26,7 @@
       "value": "new"
     },
     "publicIpAddressName": {
-      "value": "orion-ip"
+      "value": "pip-test"
     },
     "publicIpDns": {
       "value": "orion"
@@ -41,7 +41,7 @@
       "value": "Basic"
     },
     "virtualMachineName": {
-      "value": "orion-vm"
+      "value": "vm-test"
     },
     "osDiskType": {
       "value": "StandardSSD_LRS"
@@ -62,7 +62,7 @@
       "value": ""
     },
     "dbServerName": {
-      "value": "orion-db"
+      "value": "sqldb-test"
     },
     "databaseName": {
       "value": "SolarWindsOrionDatabase"

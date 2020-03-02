@@ -2,11 +2,17 @@
 
 param 
 (
-    [ValidateSet("eoc","ets","ipam","ncm","npm","nta","OrionLogManager","sam","scm","srm","udt","vman","vnqm","whd","wpm")] [string] [Parameter(Mandatory = $true)] $Product,
+    [ValidateSet("eoc", "ets", "ipam", "ncm", "npm", "nta", "OrionLogManager", "sam", "scm", "srm", "udt", "vman", "vnqm", "whd", "wpm")] [string] [Parameter(Mandatory = $true)] $Product,
     [string] [Parameter(Mandatory = $true)] $Password,
     [string] [alias("ResourceGroupLocation")] $Location = "westeurope",
+    [string] $ParametersFile = ".\common\deployment\azuredeploy.parameters.json",
     [string] $DSCSourceFolder = ".\common\DSC",
-    [string] $ResourceGroupName
+    [string] $ResourceGroupName,
+    [string] $VNetResourceGroupName,
+    [string] $PublicIpResourceGroupName,
+    [string] $PublicIpAddressName,
+    [string] $PublicIpDns,
+    [switch] $SkipParametersUpdate
 )
 
 $Guid = New-Guid
@@ -15,8 +21,9 @@ $DscFolder = "$WorkFolder\DSC"
 $InstallerFolder = "$WorkFolder\installer"
 
 if (-not $ResourceGroupName) {
-    $ResourceGroupName = "$Product-marketplaces-test"
+    $ResourceGroupName = "rg-test-$Product"
 }
+
 if (-not (Test-Path $DscFolder)) {
     New-Item $DscFolder -ItemType "Directory"
 }
@@ -40,27 +47,49 @@ Copy-Item -Path ".\common\installer\*.exe" -Destination $InstallerFolder -Recurs
 Write-Host "Copying provisioning scripts to $WorkFolder..."
 Copy-Item -Path ".\common\provisioning\*" -Destination $WorkFolder -Recurse
 
-$azuredeploy = Get-Content ".\common\deployment\azuredeploy.parameters.json" -raw | ConvertFrom-Json
-$parametersToPrefix = @("subnetName", "virtualNetworkName", "publicIpAddressName", "virtualMachineName")
-$passwordsToReplace = @("dbPassword", "appUserPassword", "adminPassword")
-$resourceGroupNames = @("publicIpResourceGroupName", "virtualNetworkRG")
-$azuredeploy.parameters.PSObject.Properties | ForEach-Object { 
-    if ($parametersToPrefix -contains $_.Name) { 
-        $value = $_.Value.value
-        $_.Value.value = "$Product-$value"
-    } 
-    if ($passwordsToReplace -contains $_.Name) { 
-        $value = $_.Value.value
-        $_.Value.value = $Password
-    } 
-    if ($resourceGroupNames -contains $_.Name) { 
-        $value = $_.Value.value
-        $_.Value.value = $ResourceGroupName
-    } 
+if (-not $SkipParametersUpdate) {
+    $azuredeploy = Get-Content $ParametersFile -raw | ConvertFrom-Json
+    $parametersToSuffix = @("subnetName", "virtualNetworkName", "publicIpAddressName", "virtualMachineName")
+    $passwordsToReplace = @("dbPassword", "appUserPassword", "adminPassword")
+    $vnetResourceGroupNames = @("publicIpResourceGroupName", "virtualNetworkRG")
+    $azuredeploy.parameters.PSObject.Properties | ForEach-Object { 
+        if ($parametersToSuffix -contains $_.Name) { 
+            $value = $_.Value.value
+            $_.Value.value = "$value-$Product"
+        } 
+        if ($passwordsToReplace -contains $_.Name) { 
+            $value = $_.Value.value
+            $_.Value.value = $Password
+        } 
+        if ($vnetResourceGroupNames -contains $_.Name) { 
+            $value = $_.Value.value
+            $_.Value.value = $ResourceGroupName
+        } 
+    }
+    if ($VNetResourceGroupName) {
+        $azuredeploy.parameters.virtualNetworkNewOrExisting.value = "existing"     
+        $azuredeploy.parameters.virtualNetworkRG.value = $VNetResourceGroupName
+    }
+
+    if ($PublicIpResourceGroupName) {
+        $azuredeploy.parameters.publicIpNewOrExisting = "existing"
+        $azuredeploy.parameters.publicIpResourceGroupName.value = $ResourceGroupName
+    }
+    if ($PublicIpAddressName) {
+        $azuredeploy.parameters.publicIpAddressName = $PublicIpAddressName
+    }
+    if ($PublicIpDns) {
+        $azuredeploy.parameters.publicIpDns = $PublicIpDns
+    }
+    else {
+        $azuredeploy.parameters.publicIpDns.value = "web-$Product-$Guid" 
+    }
+
+    $azuredeploy.parameters.dbServerName.value = "sqldb-test-$Product-$Guid"
+    $azuredeploy | ConvertTo-Json -depth 32 | Set-Content "$WorkFolder\azuredeploy.parameters.json"
+} else {
+    Copy-Item -Path $ParametersFile -Destination "$WorkFolder\azuredeploy.parameters.json"
 }
-$azuredeploy.parameters.publicIpDns.value = "$Product-$Guid" 
-$azuredeploy.parameters.dbServerName.value = "$Product-db-$Guid"
-$azuredeploy | ConvertTo-Json -depth 32 | Set-Content "$WorkFolder\azuredeploy.parameters.json"
 
 #Deploy
 .\Deploy-AzTemplate.ps1 -ArtifactStagingDirectory $WorkFolder -Location $Location -ResourceGroupName $ResourceGroupName
