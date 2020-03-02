@@ -116,7 +116,7 @@
 						"visible": true
 					},
 					{
-                        "name": "newsletter",
+                        "name": "saveMoney",
                         "type": "Microsoft.Common.Section",
                         "label": "Save Money",
                         "elements": [
@@ -183,7 +183,7 @@
 							"minAddressPrefixSize": "/24"
 						},
 						"options": {
-							"hideExisting": true
+							"hideExisting": false
 						},
 						"subnets": {
 							"subnet1": {
@@ -423,7 +423,7 @@
 			"databaseName": "[steps('DatabaseSettings').AzureDbDetails.databaseName]",
 			"dbUserName": "[steps('DatabaseSettings').dbUserName]",
 			"dbPassword": "[steps('DatabaseSettings').dbPassword]",
-			"windowsLicenseType": "[steps('OSDetails').windowsLicenseType]"
+			"windowsLicenseType": "[steps('OSDetails').saveMoney.windowsLicenseType]"
 		}
 	}
 }
