@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "westeurope"
+    },
+    "subnetName": {
+      "value": "orion-snet"
+    },
+    "virtualNetworkNewOrExisting": {
+      "value": "new"
+    },
+    "virtualNetworkName": {
+      "value": "orion-vnet"
+    },
+    "addressPrefixes": {
+      "value": [
+        "10.0.0.0/24"
+      ]
+    },
+    "subnetPrefix": {
+      "value": "10.0.0.0/24"
+    },
+    "publicIpNewOrExisting": {
+      "value": "new"
+    },
+    "publicIpAddressName": {
+      "value": "orion-ip"
+    },
+    "publicIpDns": {
+      "value": "orion"
+    },
+    "publicIpResourceGroupName": {
+      "value": "template"
+    },
+    "publicIpAddressType": {
+      "value": "Dynamic"
+    },
+    "publicIpAddressSku": {
+      "value": "Basic"
+    },
+    "virtualMachineName": {
+      "value": "orion-vm"
+    },
+    "osDiskType": {
+      "value": "StandardSSD_LRS"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_DS3_v2"
+    },
+    "image": {
+      "value": "2019-Datacenter"
+    },
+    "adminUsername": {
+      "value": "OrionAdmin"
+    },
+    "adminPassword": {
+      "value": ""
+    },
+    "appUserPassword": {
+      "value": ""
+    },
+    "dbServerName": {
+      "value": "orion-db"
+    },
+    "databaseName": {
+      "value": "SolarWindsOrionDatabase"
+    },
+    "dbUserName": {
+      "value": "OrionAdmin"
+    },
+    "dbPassword": {
+      "value": ""
+    },
+    "virtualNetworkRG": {
+      "value": "template"
+    },
+    "windowsLicenseType": {
+      "value": "no"
+    },
+    "ScalabilityEngine": {
+      "value": "No"
+    }
+  }
+}
