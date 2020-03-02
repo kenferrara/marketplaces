@@ -176,7 +176,7 @@
 							"subnets": "Subnets for the virtual network"
 						},
 						"defaultValue": {
-							"name": "VirtualNetwork",
+							"name": "vnet-orion",
 							"addressPrefixSize": "/24"
 						},
 						"constraints": {
@@ -189,7 +189,7 @@
 							"subnet1": {
 								"label": "Subnet",
 								"defaultValue": {
-									"name": "Subnet-1",
+									"name": "snet-orion",
 									"addressPrefixSize": "/24"
 								},
 								"constraints": {
