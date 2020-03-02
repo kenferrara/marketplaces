@@ -15,6 +15,13 @@ param
     [switch] $SkipParametersUpdate
 )
 
+if (-not (Test-Path ".\Deploy-AzTemplate.ps1")) {
+    Invoke-WebRequest "https://github.com/Azure/azure-quickstart-templates/raw/master/Deploy-AzTemplate.ps1" -UseBasicParsing -OutFile "Deploy-AzTemplate.ps1"
+}
+if (-not (Test-Path ".\SideLoad-AzCreateUIDefinition.ps1")) {
+    Invoke-WebRequest "https://github.com/Azure/azure-quickstart-templates/raw/master/SideLoad-AzCreateUIDefinition.ps1" -UseBasicParsing -OutFile "SideLoad-AzCreateUIDefinition.ps1"
+}
+
 $Guid = New-Guid
 $WorkFolder = ".\$Product\templates"
 $DscFolder = "$WorkFolder\DSC"
