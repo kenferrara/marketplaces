@@ -12,7 +12,8 @@ param
     [string] $PublicIpResourceGroupName,
     [string] $PublicIpAddressName,
     [string] $PublicIpDns,
-    [switch] $SkipParametersUpdate
+    [switch] $SkipParametersUpdate,
+    [switch] $SkipDeploy
 )
 
 if (-not (Test-Path ".\Deploy-AzTemplate.ps1")) {
@@ -54,7 +55,16 @@ Copy-Item -Path ".\common\installer\*.exe" -Destination $InstallerFolder -Recurs
 Write-Host "Copying provisioning scripts to $WorkFolder..."
 Copy-Item -Path ".\common\provisioning\*" -Destination $WorkFolder -Recurse
 
-if (-not $SkipParametersUpdate) {
+# Exit if deployment is not needed
+if ($SkipDeploy) {
+    Write-Host "Configuration for $Product has been created"
+    Write-Host "Skipping deployment..."
+    exit
+}
+
+if ($SkipParametersUpdate) {
+    Copy-Item -Path $ParametersFile -Destination "$WorkFolder\azuredeploy.parameters.json"
+} else {
     $azuredeploy = Get-Content $ParametersFile -raw | ConvertFrom-Json
     $parametersToSuffix = @("subnetName", "virtualNetworkName", "publicIpAddressName", "virtualMachineName")
     $passwordsToReplace = @("dbPassword", "appUserPassword", "adminPassword")
@@ -94,8 +104,6 @@ if (-not $SkipParametersUpdate) {
 
     $azuredeploy.parameters.dbServerName.value = "sqldb-test-$Product-$Guid"
     $azuredeploy | ConvertTo-Json -depth 32 | Set-Content "$WorkFolder\azuredeploy.parameters.json"
-} else {
-    Copy-Item -Path $ParametersFile -Destination "$WorkFolder\azuredeploy.parameters.json"
 }
 
 #Deploy
