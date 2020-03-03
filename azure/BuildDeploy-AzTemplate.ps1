@@ -13,7 +13,8 @@ param
     [string] $PublicIpAddressName,
     [string] $PublicIpDns,
     [switch] $SkipParametersUpdate,
-    [switch] $SkipDeploy
+    [switch] $SkipDeploy,
+    [switch] $BuildPackage
 )
 
 if (-not (Test-Path ".\Deploy-AzTemplate.ps1")) {
@@ -54,6 +55,18 @@ Copy-Item -Path ".\common\installer\*.exe" -Destination $InstallerFolder -Recurs
 
 Write-Host "Copying provisioning scripts to $WorkFolder..."
 Copy-Item -Path ".\common\provisioning\*" -Destination $WorkFolder -Recurse
+
+if ($BuildPackage) {
+    $outputPath = ".\.build\$Product\"
+    if (-not (Test-Path $outputPath)) {
+        New-Item $outputPath -ItemType "Directory"
+    }
+
+    $date = Get-Date -Format "yyyy_MM_dd"
+    Write-Host "Building a deployment package..."
+    Get-ChildItem -Path $WorkFolder -Exclude "azuredeploy.parameters.json" |
+        Compress-Archive -DestinationPath "$outputPath\$Product-$date.zip" -Update
+}
 
 # Exit if deployment is not needed
 if ($SkipDeploy) {
