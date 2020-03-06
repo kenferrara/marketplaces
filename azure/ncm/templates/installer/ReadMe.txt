@@ -1,1 +1,0 @@
-Please copy the latest online "Solarwinds-Orion-NCM.exe" and .net version 4.8 installer "ndp48-web.exe" in installer folder and delete this file before packaging and uploading.
