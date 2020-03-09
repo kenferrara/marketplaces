@@ -1,16 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SilentConfig>
   <InstallerConfiguration>
-    <ProductsToInstall>NTA</ProductsToInstall>
-    <!-- true - standard installation, false - express installation -->
+    <ProductsToInstall></ProductsToInstall>
     <AdvancedInstallMode>True</AdvancedInstallMode>
-    <!-- true - skips CW -->
     <SkipConfigurationWizardRun>False</SkipConfigurationWizardRun>
-    <VerifyErrorStrings>finished due to error;Login failed for user;ERROR ConfigurationProgressScene</VerifyErrorStrings>
     <WebConsoleUserName>Admin</WebConsoleUserName>
-		<!--Enter password only for first installation of SE.-->
-		<!--Password is required for Orion Platform 2019.2 and later.)-->  
-		<WebConsolePassword></WebConsolePassword>
+    <WebConsolePassword></WebConsolePassword>
   </InstallerConfiguration>
   <Host>
     <Info>
@@ -19,18 +14,21 @@
       <ReconfigureServices>true</ReconfigureServices>
       <ReconfigurePermissions>true</ReconfigurePermissions>
       <Database>
-        <CreateNewDatabase>false</CreateNewDatabase>
-        <DatabaseName>SolarWindsOrion</DatabaseName>
-        <ServerName>oriondbserver</ServerName>
-        <!-- should SQL login be used, if set to 'false' windows authentication is used -->
-	      <UseSQLSecurity>true</UseSQLSecurity>
-        <!-- sql server master users (usually 'sa') -->
+        <CreateNewDatabase>true</CreateNewDatabase>
+        <!--(Sets flag to create new database during CW)-->
+        <UseSQLSecurity>true</UseSQLSecurity>
+        <!--(Enables SQL Server authentication)-->
+        <ServerName>OrionDbServer</ServerName>
+        <DatabaseName>OrionDatabase</DatabaseName>
+        <!--(SQL server and database name, e.g.: localhost)-->
         <User>orionadmin</User>
         <UserPassword></UserPassword>
-        <!-- sql server account details that will be used by Orion -->
-        <AccountType>NewSql</AccountType> <!-- other option ExistingSql -->
+        <!--(Azure SQL account)-->
+        <AccountType>NewSql</AccountType>
+        <!--(Orion database account access type. Other possible values: ExistingSql, ExistingWindows)-->
         <Account>SolarWindsOrionDatabaseUser</Account>
         <AccountPassword></AccountPassword>
+        <!--(Orion database account, e.g.: SolarwindsOrionDatabaseUser)-->
       </Database>
       <Website>
         <Folder>C:\InetPub\SolarWinds</Folder>
@@ -39,31 +37,15 @@
         <ApplicationName>SolarWinds NetPerfMon</ApplicationName>
         <LaunchWebConsole>false</LaunchWebConsole>
         <ConfigurationSkipped_IISNotInstalled>false</ConfigurationSkipped_IISNotInstalled>
-        <EnableWindowsLogin>false</EnableWindowsLogin>
+        <EnableWindowsLogin>true</EnableWindowsLogin>
         <CertificateResolvableCN>insert_machine_name_here</CertificateResolvableCN>
-				<CertificateHash>AutoGenerate</CertificateHash>
-				<CertificateName>Generate Self-Signed Certificate...</CertificateName> 
-				<EnableHTTPS>true</EnableHTTPS>              
-				<SkipHTTPBinding>false</SkipHTTPBinding>
+        <CertificateHash>AutoGenerate</CertificateHash>
+        <CertificateName>Generate Self-Signed Certificate...</CertificateName>
+        <EnableHTTPS>true</EnableHTTPS>
+        <SkipHTTPBinding>false</SkipHTTPBinding>
+        <defaultAdminPassword></defaultAdminPassword>
       </Website>
-      <NetFlowConfiguration>
-        <FlowStorageConfig>
-          <!-- options have similar functionlity as main 'Database' element -->
-          <CreateNewDatabase>false</CreateNewDatabase>
-          <!-- database name should different than main database -->
-          <DatabaseName>ntadb</DatabaseName>
-          <ServerName>oriondbserver</ServerName>
-	        <UseSQLSecurity>true</UseSQLSecurity>
-          <User>orionadmin</User>
-          <UserPassword></UserPassword>
-          <AccountType>NewSql</AccountType>
-          <Account>SolarWindsNtaDatabaseUser</Account>
-          <AccountPassword></AccountPassword>
-        </FlowStorageConfig>
-      </NetFlowConfiguration>
     </Info>
   </Host>
-  <Plugins>
-    <Plugin Assembly="SolarWinds.ConfigurationWizard.Plugin.NetFlow" FactoryType="SolarWinds.ConfigurationWizard.Plugin.NetFlow.SilentMode.NetFlowSilentConfigureFactory" />
-  </Plugins>
+  <Plugins/>
 </SilentConfig>

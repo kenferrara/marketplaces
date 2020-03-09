@@ -28,6 +28,8 @@ $Guid = New-Guid
 $WorkFolder = ".\$Product\templates"
 $DscFolder = "$WorkFolder\DSC"
 $InstallerFolder = "$WorkFolder\installer"
+$SilentConfigFolder = "$WorkFolder\config"
+$SilentConfigFile = "$SilentConfigFolder\standard.xml"
 
 if (-not $ResourceGroupName) {
     $ResourceGroupName = "rg-test-$Product"
@@ -38,6 +40,9 @@ if (-not (Test-Path $DscFolder)) {
 }
 if (-not (Test-Path $InstallerFolder)) {
     New-Item $InstallerFolder -ItemType "Directory"
+}
+if (-not (Test-Path $SilentConfigFolder)) {
+    New-Item $SilentConfigFolder -ItemType "Directory"
 }
 
 if (Test-Path $DSCSourceFolder) {
@@ -56,6 +61,18 @@ Copy-Item -Path ".\common\installer\*.exe" -Destination $InstallerFolder -Recurs
 Write-Host "Copying provisioning scripts to $WorkFolder..."
 Copy-Item -Path ".\common\provisioning\*" -Destination $WorkFolder -Recurse
 
+if (-not (Test-Path $SilentConfigFile)) {
+    Write-Host "Copying default silent installer configuration to $SilentConfigFile"
+    Copy-Item -Path ".\common\config\standard.xml" -Destination $SilentConfigFile
+    $fullConfigFilePath = (Resolve-Path -Path $SilentConfigFile).Path
+
+    Write-Host "Setting application to install to ${$Product.ToUpper()}"
+    $xml = New-Object XML
+    $xml.Load($fullConfigFilePath)
+    $xml.SilentConfig.InstallerConfiguration.ProductsToInstall = $Product.ToUpper()
+    $xml.Save($fullConfigFilePath)
+}
+
 if ($BuildPackage) {
     $outputPath = ".\.build\$Product\"
     if (-not (Test-Path $outputPath)) {
@@ -65,7 +82,7 @@ if ($BuildPackage) {
     $date = Get-Date -Format "yyyy_MM_dd"
     Write-Host "Building a deployment package..."
     Get-ChildItem -Path $WorkFolder -Exclude "azuredeploy.parameters.json" |
-        Compress-Archive -DestinationPath "$outputPath\$Product-$date.zip" -Update
+    Compress-Archive -DestinationPath "$outputPath\$Product-$date.zip" -Update
 }
 
 # Exit if deployment is not needed
@@ -77,7 +94,8 @@ if ($SkipDeploy) {
 
 if ($SkipParametersUpdate) {
     Copy-Item -Path $ParametersFile -Destination "$WorkFolder\azuredeploy.parameters.json"
-} else {
+}
+else {
     $azuredeploy = Get-Content $ParametersFile -raw | ConvertFrom-Json
     $parametersToSuffix = @("subnetName", "virtualNetworkName", "publicIpAddressName", "virtualMachineName")
     $passwordsToReplace = @("dbPassword", "appUserPassword", "adminPassword")
