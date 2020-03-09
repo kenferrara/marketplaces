@@ -77,9 +77,6 @@ Write-Host "Download installer Completed"; [datetime]::Now
 $xml = New-Object XML
 $xml.Load($configfilePath)
 
-$node = $xml.SilentConfig.InstallerConfiguration
-$node.WebConsolePassword = $appUserPassword
-
 if ($xml.SilentConfig.Host.Info.Database) {
 	$dbnode = $xml.SilentConfig.Host.Info.Database	
 	$dbnode.ServerName = $dbServerName
@@ -109,6 +106,7 @@ if ($xml.SilentConfig.Host.Info.OrionLogConfiguration.StorageConfig) {
 
 if ($xml.SilentConfig.Host.Info.Website) {
 	$nodeWebsite = $xml.SilentConfig.Host.Info.Website
+	$nodeWebsite.defaultAdminPassword = $appUserPassword
 	$nodeWebsite.CertificateResolvableCN = $vmName
 }
 
