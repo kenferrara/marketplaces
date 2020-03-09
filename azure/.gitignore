@@ -6,6 +6,10 @@ SideLoad-AzCreateUIDefinition.ps1
 **/installer
 **/DSC
 
+**/templates/config
+!nta/templates/config
+!OrionLogManager/templates/config
+
 *.txt
 *.log
 
