@@ -211,7 +211,7 @@
             "id": "[resourceId(parameters('publicIpResourceGroupName'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName'))]"
         },
         "networkInterfaceName": "[concat('nic-',parameters('virtualMachineName'))]",
-        "networkSecurityGroupName": "[concat('nsg-', parameters('virtualMachineName'))]",
+        "networkSecurityGroupName": "[if(equals(parameters('ScalabilityEngine'), 'No'), 'nsg-weballow-001', 'nsg-webandseallow-001')]",
         "subnetRef": "[resourceId(parameters('virtualNetworkRG'), 'Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "dotnetInstallerUri": "[uri(parameters('_artifactsLocation'), concat('installer/ndp48-web.exe', parameters('_artifactsLocationSasToken')))]",
         "machineSetupScriptUri": "[uri(parameters('_artifactsLocation'), concat('DSC/OrionAzureSetup.zip', parameters('_artifactsLocationSasToken')))]",
@@ -289,7 +289,7 @@
     "resources": [
         {
             "apiVersion": "2019-09-01",
-            "name": "pid-ee45e73f-5db8-5831-9a58-52aa236b27bb",
+            "name": "SolarWinds.Orion.SCM",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -527,7 +527,19 @@
                             ]
                         },
                         "protectedSettings": {
-                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installation_script.ps1 ','-silentConfigUri \"', variables('silentConfigUri'),'\" -installerUri \"', variables('installerUri'),'\" -dbServerName ', if(equals(parameters('provisionSqlServer'), bool('false')), parameters('dbServerName'), reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName),' -databaseName ',parameters('databaseName'),' -dbUserName ',parameters('dbUserName'),' -dbPassword ',parameters('dbPassword'),' -appUserPassword ',parameters('appUserPassword'),' -vmName ',parameters('virtualMachineName')) ]"
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installation_script.ps1 '
+                                ,'-silentConfigUri \"', variables('silentConfigUri')
+                                ,'\" -installerUri \"', variables('installerUri')
+                                ,'\" -dbServerName '
+                                    , if(equals(parameters('provisionSqlServer'), bool('false'))
+                                        , parameters('dbServerName')
+                                        , reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
+                                ,' -databaseName ',parameters('databaseName')
+                                ,' -dbUserName ',parameters('dbUserName')
+                                ,' -dbPassword ',parameters('dbPassword')
+                                ,' -appUserPassword ',parameters('appUserPassword')
+                                ,' -vmName ',parameters('virtualMachineName')
+                                )]"
                         }
                     }
                 }

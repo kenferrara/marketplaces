@@ -263,7 +263,6 @@
 							{
 								"name": "ShowExpressTextFirst",
 								"type": "Microsoft.Common.TextBlock",
-								"visible": "[steps('DatabaseSettings').installationtype]",
 								"options": {
 									"text": "Orion will create a 'Standard S3' tier Azure SQL database \nwhich is recommended for most evaluations."
 								}
@@ -271,7 +270,6 @@
 							{
 								"name": "ShowExpressTextSecond",
 								"type": "Microsoft.Common.TextBlock",
-								"visible": "[steps('DatabaseSettings').installationtype]",
 								"options": {
 									"text": "Upgrading the Azure SQL database tier may be done at any time through the Microsoft Azure Portal and does not require any changes to Orion."
 								}
@@ -282,8 +280,9 @@
 					{
 						"name": "AzureDbDetails",
 						"type": "Microsoft.Common.Section",
-						"label": "Enter Microsoft SQL Server details",
-						"elements": [{
+						"label": "Enter Orion Database details",
+						"elements": [
+							{
 								"name": "ShowDBConnectionTest",
 								"type": "Microsoft.Common.TextBlock",
 								"options": {
@@ -293,19 +292,19 @@
 							{
 								"name": "dbServerName",
 								"type": "Microsoft.Common.TextBox",
-								"label": "DB Server Name (Fully Qualified)",
-								"toolTip": "Fully qualified SQL server name. This should be an existing SQL server.",
+								"label": "DB Server Name (FQDN)",
+								"toolTip": "Provide a Fully Qualified SQL Server name. This must be an existing SQL Server.",
 								"constraints": {
 									"regex": "([^.]*\\.){3}",
 									"required": true,
-									"validationMessage": "The SQL Server Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only alongwith FQDN(e.g database.windows.net). The sql server should be an existing server."
+									"validationMessage": "The SQL Server Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only alongwith FQDN (e.g database.windows.net). The SQL server should be an existing server."
 								}
 							},
 							{
 								"name": "databaseName",
 								"type": "Microsoft.Common.TextBox",
 								"label": "Database Name",
-								"toolTip": "Provide database name",
+								"toolTip": "Provide Orion database name.",
 								"constraints": {
 									"regex": "^(?!master$|model$|msdb$|tempdb$|pdwtempdb$|pdwtempdb1$|pdwtempdb2$|DWConfiguration$|DWDiagnostics$|DWQueue$)[^.]{1,128}$",
 									"required": true,
@@ -318,8 +317,8 @@
 					{
 						"name": "dbUserName",
 						"type": "Microsoft.Common.TextBox",
-						"label": "DB Server Admin username",
-						"toolTip": "Provide user name",
+						"label": "DB Server Admin User Name",
+						"toolTip": "Provide database server admin user name.",
 						"constraints": {
 							"regex": "^(?!admin$|administrator$|sa$|root$|dbmanager$|loginmanager$|dbo$|guest$|information_schema$|sys$|db_accessadmin$|db_backupoperator$|db_datareader$|db_datawriter$|db_ddladmin$|db_denydatareader$|db_denydatawriter$|db_owner$|db_securityadmin$|public$|@|\\$|[0-9])[a-z0-9A-Z-_!@$^]{3,79}$",
 							"required": true,
@@ -330,7 +329,7 @@
 					{
 						"name": "dbPassword",
 						"type": "Microsoft.Common.PasswordBox",
-						"toolTip": "Please provide the password",
+						"toolTip": "Provide database server admin password.",
 						"label": {
 							"password": "Password",
 							"confirmPassword": "Confirm password"

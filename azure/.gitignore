@@ -3,12 +3,8 @@ SideLoad-AzCreateUIDefinition.ps1
 
 **/templates/azuredeploy.parameters.json
 **/templates/installation_script.ps1
-**/installer
-**/DSC
-
-**/templates/config
-!nta/templates/config
-!OrionLogManager/templates/config
+**/templates/installer
+**/templates/DSC
 
 *.txt
 *.log

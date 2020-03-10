@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SilentConfig>
+  <InstallerConfiguration>
+    <ProductsToInstall>{{productToInstall}}</ProductsToInstall>
+    <AdvancedInstallMode>True</AdvancedInstallMode>
+    <SkipConfigurationWizardRun>False</SkipConfigurationWizardRun>
+  </InstallerConfiguration>
+  <Host>
+    <Info>
+      <ReconfigureDatabase>true</ReconfigureDatabase>
+      <ReconfigureWebsite>true</ReconfigureWebsite>
+      <ReconfigureServices>true</ReconfigureServices>
+      <ReconfigurePermissions>true</ReconfigurePermissions>
+      <Database>
+        <CreateNewDatabase>true</CreateNewDatabase>
+        <UseSQLSecurity>true</UseSQLSecurity>
+        <ServerName></ServerName>
+        <DatabaseName>SolarWindsOrion</DatabaseName>
+        <User>orionadmin</User>
+        <UserPassword></UserPassword>
+        <AccountType>NewSql</AccountType>
+        <Account>SolarWindsOrionDatabaseUser</Account>
+        <AccountPassword></AccountPassword>
+      </Database>
+      <Website>
+        <Folder>C:\InetPub\SolarWinds</Folder>
+        <Address>(All Unassigned)</Address>
+        <Port>8787</Port>
+        <ApplicationName>SolarWinds NetPerfMon</ApplicationName>
+        <LaunchWebConsole>false</LaunchWebConsole>
+        <ConfigurationSkipped_IISNotInstalled>false</ConfigurationSkipped_IISNotInstalled>
+        <EnableWindowsLogin>true</EnableWindowsLogin>
+        <CertificateResolvableCN>insert_machine_name_here</CertificateResolvableCN>
+        <CertificateHash>AutoGenerate</CertificateHash>
+        <CertificateName>Generate Self-Signed Certificate...</CertificateName>
+        <EnableHTTPS>true</EnableHTTPS>
+        <SkipHTTPBinding>false</SkipHTTPBinding>
+        <DefaultAdminPassword></DefaultAdminPassword>
+      </Website>
+      {{#nta}}
+      <NetFlowConfiguration>
+        <FlowStorageConfig>
+          <CreateNewDatabase>false</CreateNewDatabase>
+          <DatabaseName>SolarWindsNtaDatabase</DatabaseName>
+          <ServerName></ServerName>
+	        <UseSQLSecurity>true</UseSQLSecurity>
+          <User>orionadmin</User>
+          <UserPassword></UserPassword>
+          <AccountType>NewSql</AccountType>
+          <Account>SolarWindsNtaDatabaseUser</Account>
+          <AccountPassword></AccountPassword>
+        </FlowStorageConfig>
+      </NetFlowConfiguration>
+      {{/nta}}
+      {{#la}}
+      <OrionLogConfiguration>
+				<StorageConfig>
+					<CreateNewDatabase>false</CreateNewDatabase>
+					<DatabaseName>SolarWindsLaDatabase</DatabaseName>
+					<ServerName></ServerName>
+					<UseSQLSecurity>true</UseSQLSecurity>
+					<User>orionadmin</User>
+					<UserPassword></UserPassword>
+					<AccountType>NewSql</AccountType>
+					<Account>SolarWindsLaDatabaseUser</Account>
+					<AccountPassword></AccountPassword>
+				</StorageConfig>
+			</OrionLogConfiguration>
+      {{/la}}
+    </Info>
+  </Host>
+  <Plugins>
+    {{#nta}}
+    <Plugin Assembly="SolarWinds.ConfigurationWizard.Plugin.NetFlow" FactoryType="SolarWinds.ConfigurationWizard.Plugin.NetFlow.SilentMode.NetFlowSilentConfigureFactory" />
+    {{/nta}}
+    {{#la}}
+    <Plugin FactoryType="SolarWinds.ConfigurationWizard.Plugin.LogMgmt.SilentConfigureFactory" Assembly="SolarWinds.ConfigurationWizard.Plugin.LogMgmt"/>
+    {{/la}}
+  </Plugins>
+</SilentConfig>

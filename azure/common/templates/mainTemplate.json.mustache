@@ -1,0 +1,646 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location needs to be provided"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Subnet Name needs to be provided"
+            }
+        },
+        "virtualNetworkNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "metadata": {
+                "description": "Determines whether or not a new virtual network should be provisioned."
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the virtual network"
+            }
+        },
+        "addressPrefixes": {
+            "type": "array",
+            "defaultValue": [
+                "10.0.0.0/16"
+            ],
+            "metadata": {
+                "description": "Addresses of the Virtual Machine."
+            }
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "description": "Subnets for the virtual network"
+            }
+        },
+        "publicIpNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "metadata": {
+                "description": "Determines whether or not a new public ip should be provisioned."
+            }
+        },
+        "publicIpAddressName": {
+            "type": "string",
+            "defaultValue": "{{product}}server-ip",
+            "metadata": {
+                "description": "Public IP Address Name for the VM"
+            }
+        },
+        "publicIpDns": {
+            "type": "string",
+            "defaultValue": "[concat('{{product}}server-', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "DNS of the public ip address for the VM"
+            }
+        },
+        "publicIpResourceGroupName": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Name of the resource group for the public ip address"
+            }
+        },
+        "publicIpAddressType": {
+            "type": "string",
+            "defaultValue": "Dynamic",
+            "metadata": {
+                "description": "Public IP Address Type for the VM"
+            }
+        },
+        "publicIpAddressSku": {
+            "type": "string",
+            "defaultValue": "Basic",
+            "metadata": {
+                "description": "Public IP Address Sku for the VM"
+            }
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "{{product}}server",
+            "metadata": {
+                "description": "The name of the Virtual Machine."
+            }
+        },
+        "virtualNetworkRG": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource Group of the Virtual Network."
+            }
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "StandardSSD_LRS",
+            "metadata": {
+                "description": "You can choose between Azure managed disks types to support your workload or scenario. Learn more about managed disk types."
+            }
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_DS12_v2",
+            "metadata": {
+                "description": "The size of virtual machine to provision for the application."
+            }
+        },
+        "image": {
+            "type": "string",
+            "defaultValue": "2016-Datacenter",
+            "metadata": {
+                "description": "The OS version of virtual machine to provision for the VM."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Provide admin username for the virtual machine"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Provide admin password for the virtual machine"
+            }
+        },
+        "appUserPassword": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide password for the application"
+            }
+        },
+        "dbServerName": {
+            "type": "string",
+            "defaultValue": "[concat('oriondbserver', uniqueString(subscription().id, resourceGroup().id))]",
+            "metadata": {
+                "description": "Provide server name for the azure sql"
+            }
+        },
+        "databaseName": {
+            "type": "string",
+            "defaultValue": "[concat('oriondatabase', uniqueString(subscription().id, resourceGroup().id))]",
+            "metadata": {
+                "description": "Provide database name for the azure sql"
+            }
+        },
+        "dbUserName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide user name for the azure sql"
+            }
+        },
+        "dbPassword": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide password for the azure sql"
+            }
+        },
+        {{#additionalDatabase}}
+        "{{product}}ServerName": {
+            "type": "string",
+            "defaultValue": "[concat('oriondbserver', uniqueString(subscription().id, resourceGroup().id))]",
+            "metadata": {
+                "description": "Provide server name for the azure sql"
+            }
+        },
+        "{{product}}DatabaseName": {
+            "type": "string",
+            "defaultValue": "[concat('{{product}}database', uniqueString(subscription().id, resourceGroup().id))]",
+            "metadata": {
+                "description": "Provide database name for the azure sql"
+            }
+        },
+        "{{product}}UserName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide user name for the azure sql"
+            }
+        },
+        "{{product}}Password": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide password for the azure sql"
+            }
+        },
+        {{/additionalDatabase}}
+        "provisionSqlServer": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Provide installation type"
+            }
+        },
+        "windowsLicenseType": {
+            "type": "string",
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Provide license type"
+            }
+        },
+        "ScalabilityEngine": {
+            "type": "string",
+            "defaultValue": "No",
+            "metadata": {
+                "description": "Open Ports to support Scalablity Engine"
+            }
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "defaultValue": "[deployment().properties.templateLink.uri]",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+            }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+            },
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+        "silentConfigUri": "[uri(parameters('_artifactsLocation'), concat('config/standard.xml', parameters('_artifactsLocationSasToken')))]",
+        "installerUri": "[uri(parameters('_artifactsLocation'), concat('installer/Solarwinds-Orion-Installer.exe', parameters('_artifactsLocationSasToken')))]",
+        "scriptFileUri": "[uri(parameters('_artifactsLocation'), concat('installation_script.ps1', parameters('_artifactsLocationSasToken')))]",
+        "publicIpAddressId": {
+            "id": "[resourceId(parameters('publicIpResourceGroupName'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName'))]"
+        },
+        "networkInterfaceName": "[concat('nic-',parameters('virtualMachineName'))]",
+        "networkSecurityGroupName": "[if(equals(parameters('ScalabilityEngine'), 'No'), 'nsg-weballow-001', 'nsg-webandseallow-001')]",
+        "subnetRef": "[resourceId(parameters('virtualNetworkRG'), 'Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "dotnetInstallerUri": "[uri(parameters('_artifactsLocation'), concat('installer/ndp48-web.exe', parameters('_artifactsLocationSasToken')))]",
+        "machineSetupScriptUri": "[uri(parameters('_artifactsLocation'), concat('DSC/OrionAzureSetup.zip', parameters('_artifactsLocationSasToken')))]",
+        "basicSecurityRules": [
+            {
+                "name": "OrionWebConsole8787",
+                "properties": {
+                    "priority": 1030,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "8787"
+                }
+            }
+        ],
+        "ASEsecurityRules": [
+            {
+                "name": "OrionWebConsole8787",
+                "properties": {
+                    "priority": 1030,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "8787"
+                }
+            },
+            {
+                "name": "ScalablityEngine1801",
+                "properties": {
+                    "priority": 1040,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "1801"
+                }
+            },
+            {
+                "name": "ScalablityEngine5671",
+                "properties": {
+                    "priority": 1050,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "5671"
+                }
+            },
+            {
+                "name": "ScalablityEngine17777",
+                "properties": {
+                    "priority": 1060,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "17777"
+                }
+            }
+        ],
+        "ports": "[if(equals(parameters('ScalabilityEngine'), 'No'), variables('basicSecurityRules'), variables('ASEsecurityRules'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-09-01",
+            "name": "SolarWinds.Orion.{{productUpper}}",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": "[if(not(equals(parameters('publicIpNewOrExisting'), 'none')), variables('publicIpAddressId') , json('null'))]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "condition": "[equals(parameters('virtualNetworkNewOrExisting'), 'new')]",
+            "name": "[variables('networkSecurityGroupName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": "[variables('ports')]"
+            }
+        },
+        {
+            "condition": "[equals(parameters('virtualNetworkNewOrExisting'), 'new')]",
+            "name": "[parameters('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('addressPrefixes')]"
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "condition": "[equals(parameters('publicIpNewOrExisting'), 'new')]",
+            "name": "[parameters('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('publicIpDns')]"
+                }
+            },
+            "sku": {
+                "name": "[parameters('publicIpAddressSku')]"
+            }
+        },
+        {
+            "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
+            "name": "[parameters('dbServerName')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2019-06-01-preview",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "SqlServer"
+            },
+            "properties": {
+                "administratorLogin": "[parameters('dbUserName')]",
+                "administratorLoginPassword": "[parameters('dbPassword')]",
+                "version": "12.0"
+            },
+            "resources": [
+                {
+                    "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
+                    "name": "[parameters('databaseName')]",
+                    "type": "databases",
+                    "apiVersion": "2019-06-01-preview",
+                    "location": "[parameters('location')]",
+                    "tags": {
+                        "displayName": "Database"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
+                    ],
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS"
+                    },
+                    "sku": {
+                        "name": "S3",
+                        "tier": "Standard"
+                    }
+                },
+                {{#additionalDatabase}}
+                {
+                    "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
+                    "name": "[parameters('{{product}}DatabaseName')]",
+                    "type": "databases",
+                    "apiVersion": "2019-06-01-preview",
+                    "location": "[parameters('location')]",
+                    "tags": {
+                        "displayName": "Database"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
+                    ],
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS"
+                    },
+                    "sku": {
+                        "name": "S3",
+                        "tier": "Standard"
+                    }
+                },
+                {{/additionalDatabase}}
+                {
+                    "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
+                    "name": "AllowAllMicrosoftAzureIps",
+                    "type": "firewallRules",
+                    "apiVersion": "2019-06-01-preview",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
+                    ],
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-12-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]",
+                "[parameters('databaseName')]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "[parameters('image')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true
+                    }
+                },
+                "licenseType": "[if(equals(parameters('windowsLicenseType'), 'no'), 'None', 'Windows_Server')]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "extensions",
+                    "name": "machine-setup",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Powershell",
+                        "type": "DSC",
+                        "typeHandlerVersion": "2.80",
+                        "autoUpgradeMinorVersion": "true",
+                        "settings": {
+                            "wmfVersion": "latest",
+                            "configuration": {
+                                "url": "[variables('machineSetupScriptUri')]",
+                                "script": "OrionAzureSetup.ps1",
+                                "function": "Net48Install"
+                            }
+                        },
+                        "protectedSettings": {
+                            "configurationArguments": {
+                                "installerUri": "[variables('dotnetInstallerUri')]"
+                            }
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "extensions",
+                    "name": "config-app",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]",
+                        "machine-setup"
+                    ],
+                    "tags": {
+                        "displayName": "config-app"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.9",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[variables('scriptFileUri')]"
+                            ]
+                        },
+                        "protectedSettings": {
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installation_script.ps1 '
+                                ,'-silentConfigUri \"', variables('silentConfigUri')
+                                ,'\" -installerUri \"', variables('installerUri')
+                                ,'\" -dbServerName '
+                                    , if(equals(parameters('provisionSqlServer'), bool('false'))
+                                        , parameters('dbServerName')
+                                        , reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
+                                ,' -databaseName ',parameters('databaseName')
+                                ,' -dbUserName ',parameters('dbUserName')
+                                ,' -dbPassword ',parameters('dbPassword')
+                                ,' -appUserPassword ',parameters('appUserPassword')
+                                ,' -vmName ',parameters('virtualMachineName')
+                                {{#additionalDatabase}}
+                                ,' -{{product}}DBServerName '
+                                    , if(equals(parameters('provisionSqlServer'), bool('false'))
+                                        , parameters('{{product}}ServerName')
+                                        , reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
+                                ,' -{{product}}DBName ', parameters('{{product}}DatabaseName')
+                                ,' -{{product}}DBUserName ', if(equals(parameters('provisionSqlServer'), bool('false')), parameters('{{product}}UserName'), parameters('dbUserName'))
+                                ,' -{{product}}DBPassword ', if(equals(parameters('provisionSqlServer'), bool('false')), parameters('{{product}}Password'), parameters('dbPassword'))
+                                {{/additionalDatabase}}
+                                )]"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "VM Name": {
+            "type": "string",
+            "value": "[parameters('virtualMachineName')]"
+        },
+        "VM User name": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        },
+        "SQL Database": {
+            "type": "string",
+            "value": "[parameters('databaseName')]"
+        },
+        "SQL User": {
+            "type": "string",
+            "value": "[parameters('dbUserName')]"
+        },
+        {{#additionalDatabase}}
+        "{{productUpper}} Database": {
+            "type": "string",
+            "value": "[parameters('{{product}}DatabaseName')]"
+        },
+        "{{productUpper}} DB User": {
+            "type": "string",
+            "value": "[if(equals(parameters('provisionSqlServer'), bool('false')), parameters('{{product}}UserName'), parameters('dbUserName'))]"
+        },
+        {{/additionalDatabase}}
+        "App URL Link": {
+            "type": "string",
+            "value": "[concat('https://', reference(resourceId(parameters('publicIpResourceGroupName'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName')), '2019-11-01').dnsSettings.fqdn, ':8787/orion')]"
+        },
+        "App default User": {
+            "type": "string",
+            "value": "Admin"
+        }
+    }
+}

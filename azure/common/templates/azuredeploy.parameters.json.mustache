@@ -1,0 +1,132 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "{{location}}"
+    },
+    {{^existingVnet}}
+    "virtualNetworkName": {
+      "value": "vnet-test-{{location}}"
+    },
+    "subnetName": {
+      "value": "snet-test-{{location}}"
+    },
+    "virtualNetworkNewOrExisting": {
+      "value": "new"
+    },
+    "virtualNetworkRG": {
+      "value": "{{resourceGroup}}"
+    },
+    {{/existingVnet}}
+    {{#existingVnet}}
+    "virtualNetworkName": {
+      "value": "{{vnet}}"
+    },
+    "subnetName": {
+      "value": "{{subnet}}"
+    },
+    "virtualNetworkNewOrExisting": {
+      "value": "existing"
+    },
+    "virtualNetworkRG": {
+      "value": "{{resourceGroup}}"
+    },
+    {{/existingVnet}}
+    "addressPrefixes": {
+      "value": [
+        "10.0.0.0/24"
+      ]
+    },
+    "subnetPrefix": {
+      "value": "10.0.0.0/24"
+    },
+    {{^existingIp}}
+    "publicIpNewOrExisting": {
+      "value": "new"
+    },
+    "publicIpAddressName": {
+      "value": "pip-{{product}}-test-{{location}}-001"
+    },
+    "publicIpDns": {
+      "value": "web-{{product}}-{{guid}}"
+    },
+    "publicIpResourceGroupName": {
+      "value": "{{resourceGroup}}"
+    },
+    {{/existingIp}}
+    {{#existingIp}}
+    "publicIpNewOrExisting": {
+      "value": "existing"
+    },
+    "publicIpAddressName": {
+      "value": "{{ipName}}"
+    },
+    "publicIpDns": {
+      "value": "{{ipDns}}"
+    },
+    "publicIpResourceGroupName": {
+      "value": "{{resourceGroup}}"
+    },
+    {{/existingIp}}
+    "publicIpAddressType": {
+      "value": "Dynamic"
+    },
+    "publicIpAddressSku": {
+      "value": "Basic"
+    },
+    "virtualMachineName": {
+      "value": "vmtest{{product}}"
+    },
+    "osDiskType": {
+      "value": "StandardSSD_LRS"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_DS3_v2"
+    },
+    "image": {
+      "value": "2019-Datacenter"
+    },
+    "adminUsername": {
+      "value": "OrionAdmin"
+    },
+    "adminPassword": {
+      "value": "{{password}}"
+    },
+    "appUserPassword": {
+      "value": "{{password}}"
+    },
+    "dbServerName": {
+      "value": "sqldb-{{product}}-{{guid}}-test"
+    },
+    "databaseName": {
+      "value": "SolarWindsOrionDatabase"
+    },
+    "dbUserName": {
+      "value": "OrionAdmin"
+    },
+    "dbPassword": {
+      "value": "{{password}}"
+    },
+    "windowsLicenseType": {
+      "value": "no"
+    },
+    "ScalabilityEngine": {
+      "value": "No"
+    }
+    {{#additionalDatabase}}
+    ,"{{product}}ServerName": {
+        "value": "sqldb-{{product}}-{{guid}}-test"
+    },
+    "{{product}}DatabaseName": {
+        "value": "SolarWinds{{productUpper}}Database"
+    },
+    "{{product}}UserName": {
+        "value": "OrionAdmin"
+    },
+    "{{product}}Password": {
+        "value": "{{password}}"
+    }
+    {{/additionalDatabase}}
+  }
+}

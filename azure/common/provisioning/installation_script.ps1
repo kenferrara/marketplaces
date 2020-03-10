@@ -10,10 +10,10 @@ param
 	[string]$ntaDBName,
 	[string]$ntaDBUserName,
 	[string]$ntaDBPassword,
-	[string]$olmDBServerName,
-    [string]$olmDBName,
-    [string]$olmDBUserName,
-    [string]$olmDBPassword,
+	[string]$laDBServerName,
+    [string]$laDBName,
+    [string]$laDBUserName,
+    [string]$laDBPassword,
 	[string]$appUserPassword,
 	[string]$vmName
 )
@@ -97,16 +97,16 @@ if ($xml.SilentConfig.Host.Info.NetFlowConfiguration.FlowStorageConfig) {
 
 if ($xml.SilentConfig.Host.Info.OrionLogConfiguration.StorageConfig) {
     $nodeStorageConfig = $xml.SilentConfig.Host.Info.OrionLogConfiguration.StorageConfig
-    $nodeStorageConfig.ServerName = $olmDBServerName
-    $nodeStorageConfig.DatabaseName = $olmDBName
-    $nodeStorageConfig.User = $olmDBUserName
-    $nodeStorageConfig.UserPassword = $olmDBPassword
-    $nodeStorageConfig.AccountPassword = $olmDBPassword
+    $nodeStorageConfig.ServerName = $laDBServerName
+    $nodeStorageConfig.DatabaseName = $laDBName
+    $nodeStorageConfig.User = $laDBUserName
+    $nodeStorageConfig.UserPassword = $laDBPassword
+    $nodeStorageConfig.AccountPassword = $laDBPassword
 }
 
 if ($xml.SilentConfig.Host.Info.Website) {
 	$nodeWebsite = $xml.SilentConfig.Host.Info.Website
-	$nodeWebsite.defaultAdminPassword = $appUserPassword
+	$nodeWebsite.DefaultAdminPassword = $appUserPassword
 	$nodeWebsite.CertificateResolvableCN = $vmName
 }
 
