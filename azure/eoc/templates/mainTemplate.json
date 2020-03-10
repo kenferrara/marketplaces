@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
@@ -205,44 +205,17 @@
     },
     "variables": {
         "silentConfigUri": "[uri(parameters('_artifactsLocation'), concat('config/standard.xml', parameters('_artifactsLocationSasToken')))]",
-        "installerUri": "[uri(parameters('_artifactsLocation'), concat('installer/Solarwinds-Orion-EOC.exe', parameters('_artifactsLocationSasToken')))]",
+        "installerUri": "[uri(parameters('_artifactsLocation'), concat('installer/Solarwinds-Orion-Installer.exe', parameters('_artifactsLocationSasToken')))]",
         "scriptFileUri": "[uri(parameters('_artifactsLocation'), concat('installation_script.ps1', parameters('_artifactsLocationSasToken')))]",
         "publicIpAddressId": {
             "id": "[resourceId(parameters('publicIpResourceGroupName'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName'))]"
         },
-        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-nic')]",
-        "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-nsg')]",
-        "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
-        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "dotnetInstallerUri": "[uri(parameters('_artifactsLocation'), 'installer/ndp48-web.exe')]",
-        "machineSetupScriptUri": "[uri(parameters('_artifactsLocation'), concat('config/OrionAzureSetup.zip', parameters('_artifactsLocationSasToken')))]",
+        "networkInterfaceName": "[concat('nic-',parameters('virtualMachineName'))]",
+        "networkSecurityGroupName": "[if(equals(parameters('ScalabilityEngine'), 'No'), 'nsg-weballow-001', 'nsg-webandseallow-001')]",
+        "subnetRef": "[resourceId(parameters('virtualNetworkRG'), 'Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "dotnetInstallerUri": "[uri(parameters('_artifactsLocation'), concat('installer/ndp48-web.exe', parameters('_artifactsLocationSasToken')))]",
+        "machineSetupScriptUri": "[uri(parameters('_artifactsLocation'), concat('DSC/OrionAzureSetup.zip', parameters('_artifactsLocationSasToken')))]",
         "basicSecurityRules": [
-            {
-                "name": "HTTP80",
-                "properties": {
-                    "priority": 1010,
-                    "protocol": "TCP",
-                    "access": "Allow",
-                    "direction": "Inbound",
-                    "sourceAddressPrefix": "*",
-                    "sourcePortRange": "*",
-                    "destinationAddressPrefix": "*",
-                    "destinationPortRange": "80"
-                }
-            },
-            {
-                "name": "HTTPS443",
-                "properties": {
-                    "priority": 1020,
-                    "protocol": "TCP",
-                    "access": "Allow",
-                    "direction": "Inbound",
-                    "sourceAddressPrefix": "*",
-                    "sourcePortRange": "*",
-                    "destinationAddressPrefix": "*",
-                    "destinationPortRange": "443"
-                }
-            },
             {
                 "name": "OrionWebConsole8787",
                 "properties": {
@@ -258,32 +231,6 @@
             }
         ],
         "ASEsecurityRules": [
-            {
-                "name": "HTTP80",
-                "properties": {
-                    "priority": 1010,
-                    "protocol": "TCP",
-                    "access": "Allow",
-                    "direction": "Inbound",
-                    "sourceAddressPrefix": "*",
-                    "sourcePortRange": "*",
-                    "destinationAddressPrefix": "*",
-                    "destinationPortRange": "80"
-                }
-            },
-            {
-                "name": "HTTPS443",
-                "properties": {
-                    "priority": 1020,
-                    "protocol": "TCP",
-                    "access": "Allow",
-                    "direction": "Inbound",
-                    "sourceAddressPrefix": "*",
-                    "sourcePortRange": "*",
-                    "destinationAddressPrefix": "*",
-                    "destinationPortRange": "443"
-                }
-            },
             {
                 "name": "OrionWebConsole8787",
                 "properties": {
@@ -341,22 +288,23 @@
     },
     "resources": [
         {
-            "apiVersion": "2018-05-01",
-            "name": "pid-4a8bd992-b256-5f66-aac1-cdddf174c21f",
+            "apiVersion": "2019-09-01",
+            "name": "SolarWinds.Orion.EOC",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
-                    "resources": []
+                    "resources": [
+                    ]
                 }
             }
         },
         {
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
@@ -375,16 +323,14 @@
                             "publicIPAddress": "[if(not(equals(parameters('publicIpNewOrExisting'), 'none')), variables('publicIpAddressId') , json('null'))]"
                         }
                     }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[variables('nsgId')]"
-                }
+                ]
             }
         },
         {
+            "condition": "[equals(parameters('virtualNetworkNewOrExisting'), 'new')]",
             "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2018-08-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
             "properties": {
                 "securityRules": "[variables('ports')]"
@@ -394,8 +340,11 @@
             "condition": "[equals(parameters('virtualNetworkNewOrExisting'), 'new')]",
             "name": "[parameters('virtualNetworkName')]",
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": "[parameters('addressPrefixes')]"
@@ -404,7 +353,10 @@
                     {
                         "name": "[parameters('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('subnetPrefix')]"
+                            "addressPrefix": "[parameters('subnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
                         }
                     }
                 ]
@@ -414,7 +366,7 @@
             "condition": "[equals(parameters('publicIpNewOrExisting'), 'new')]",
             "name": "[parameters('publicIpAddressName')]",
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2018-08-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIpAllocationMethod": "[parameters('publicIpAddressType')]",
@@ -430,7 +382,7 @@
             "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
             "name": "[parameters('dbServerName')]",
             "type": "Microsoft.Sql/servers",
-            "apiVersion": "2017-10-01-preview",
+            "apiVersion": "2019-06-01-preview",
             "location": "[parameters('location')]",
             "tags": {
                 "displayName": "SqlServer"
@@ -445,7 +397,7 @@
                     "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
                     "name": "[parameters('databaseName')]",
                     "type": "databases",
-                    "apiVersion": "2017-10-01-preview",
+                    "apiVersion": "2019-06-01-preview",
                     "location": "[parameters('location')]",
                     "tags": {
                         "displayName": "Database"
@@ -465,7 +417,7 @@
                     "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
                     "name": "AllowAllMicrosoftAzureIps",
                     "type": "firewallRules",
-                    "apiVersion": "2017-10-01-preview",
+                    "apiVersion": "2019-06-01-preview",
                     "location": "[parameters('location')]",
                     "dependsOn": [
                         "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
@@ -480,7 +432,7 @@
         {
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2018-06-01",
+            "apiVersion": "2019-12-01",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
@@ -525,7 +477,7 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2018-06-01",
+                    "apiVersion": "2019-12-01",
                     "type": "extensions",
                     "name": "machine-setup",
                     "location": "[parameters('location')]",
@@ -535,7 +487,7 @@
                     "properties": {
                         "publisher": "Microsoft.Powershell",
                         "type": "DSC",
-                        "typeHandlerVersion": "2.77",
+                        "typeHandlerVersion": "2.80",
                         "autoUpgradeMinorVersion": "true",
                         "settings": {
                             "wmfVersion": "latest",
@@ -543,20 +495,17 @@
                                 "url": "[variables('machineSetupScriptUri')]",
                                 "script": "OrionAzureSetup.ps1",
                                 "function": "Net48Install"
-                            },
-                            "configurationArguments": {
-                                "installerUri": "[variables('dotnetInstallerUri')]"
                             }
                         },
                         "protectedSettings": {
                             "configurationArguments": {
-                                "sasToken": "[parameters('_artifactsLocationSasToken')]"
+                                "installerUri": "[variables('dotnetInstallerUri')]"
                             }
                         }
                     }
                 },
                 {
-                    "apiVersion": "2018-06-01",
+                    "apiVersion": "2019-12-01",
                     "type": "extensions",
                     "name": "config-app",
                     "location": "[parameters('location')]",
@@ -578,7 +527,19 @@
                             ]
                         },
                         "protectedSettings": {
-                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installation_script.ps1 ','-silentConfigUri \"', variables('silentConfigUri'),'\" -installerUri \"', variables('installerUri'),'\" -dbServerName ', if(equals(parameters('provisionSqlServer'), bool('false')), parameters('dbServerName'), reference(resourceId(parameters('virtualNetworkRG'), 'Microsoft.SQL/servers', parameters('dbServerName')), '2018-06-01-preview').fullyQualifiedDomainName),' -databaseName ',parameters('databaseName'),' -dbUserName ',parameters('dbUserName'),' -dbPassword ',parameters('dbPassword'),' -appUserPassword ',parameters('appUserPassword'),' -vmName ',parameters('virtualMachineName')) ]"
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installation_script.ps1 '
+                                ,'-silentConfigUri \"', variables('silentConfigUri')
+                                ,'\" -installerUri \"', variables('installerUri')
+                                ,'\" -dbServerName '
+                                    , if(equals(parameters('provisionSqlServer'), bool('false'))
+                                        , parameters('dbServerName')
+                                        , reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
+                                ,' -databaseName ',parameters('databaseName')
+                                ,' -dbUserName ',parameters('dbUserName')
+                                ,' -dbPassword ',parameters('dbPassword')
+                                ,' -appUserPassword ',parameters('appUserPassword')
+                                ,' -vmName ',parameters('virtualMachineName')
+                                )]"
                         }
                     }
                 }
@@ -604,7 +565,7 @@
         },
         "App URL Link": {
             "type": "string",
-            "value": "[concat('https://', reference(resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName'))).dnsSettings.fqdn, ':8787/orion')]"
+            "value": "[concat('https://', reference(resourceId(parameters('publicIpResourceGroupName'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName')), '2019-11-01').dnsSettings.fqdn, ':8787/orion')]"
         },
         "App default User": {
             "type": "string",

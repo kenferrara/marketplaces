@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SilentConfig>
   <InstallerConfiguration>
-    <ProductsToInstall>NTA</ProductsToInstall>
+    <ProductsToInstall>IPAM</ProductsToInstall>
     <AdvancedInstallMode>True</AdvancedInstallMode>
     <SkipConfigurationWizardRun>False</SkipConfigurationWizardRun>
   </InstallerConfiguration>
@@ -37,22 +37,8 @@
         <SkipHTTPBinding>false</SkipHTTPBinding>
         <DefaultAdminPassword></DefaultAdminPassword>
       </Website>
-      <NetFlowConfiguration>
-        <FlowStorageConfig>
-          <CreateNewDatabase>false</CreateNewDatabase>
-          <DatabaseName>SolarWindsNtaDatabase</DatabaseName>
-          <ServerName></ServerName>
-          <UseSQLSecurity>true</UseSQLSecurity>
-          <User>orionadmin</User>
-          <UserPassword></UserPassword>
-          <AccountType>NewSql</AccountType>
-          <Account>SolarWindsNtaDatabaseUser</Account>
-          <AccountPassword></AccountPassword>
-        </FlowStorageConfig>
-      </NetFlowConfiguration>
     </Info>
   </Host>
   <Plugins>
-    <Plugin Assembly="SolarWinds.ConfigurationWizard.Plugin.NetFlow" FactoryType="SolarWinds.ConfigurationWizard.Plugin.NetFlow.SilentMode.NetFlowSilentConfigureFactory" />
   </Plugins>
 </SilentConfig>

@@ -53,14 +53,14 @@
         },
         "publicIpAddressName": {
             "type": "string",
-            "defaultValue": "npmserver-ip",
+            "defaultValue": "laserver-ip",
             "metadata": {
                 "description": "Public IP Address Name for the VM"
             }
         },
         "publicIpDns": {
             "type": "string",
-            "defaultValue": "[concat('npmserver-', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat('laserver-', uniqueString(resourceGroup().id))]",
             "metadata": {
                 "description": "DNS of the public ip address for the VM"
             }
@@ -88,7 +88,7 @@
         },
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "npmserver",
+            "defaultValue": "laserver",
             "metadata": {
                 "description": "The name of the Virtual Machine."
             }
@@ -161,6 +161,34 @@
             }
         },
         "dbPassword": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide password for the azure sql"
+            }
+        },
+        "laServerName": {
+            "type": "string",
+            "defaultValue": "[concat('oriondbserver', uniqueString(subscription().id, resourceGroup().id))]",
+            "metadata": {
+                "description": "Provide server name for the azure sql"
+            }
+        },
+        "laDatabaseName": {
+            "type": "string",
+            "defaultValue": "[concat('ladatabase', uniqueString(subscription().id, resourceGroup().id))]",
+            "metadata": {
+                "description": "Provide database name for the azure sql"
+            }
+        },
+        "laUserName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide user name for the azure sql"
+            }
+        },
+        "laPassword": {
             "type": "securestring",
             "defaultValue": "",
             "metadata": {
@@ -289,7 +317,7 @@
     "resources": [
         {
             "apiVersion": "2019-09-01",
-            "name": "SolarWinds.Orion.NPM",
+            "name": "SolarWinds.Orion.LA",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -396,6 +424,26 @@
                 {
                     "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
                     "name": "[parameters('databaseName')]",
+                    "type": "databases",
+                    "apiVersion": "2019-06-01-preview",
+                    "location": "[parameters('location')]",
+                    "tags": {
+                        "displayName": "Database"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
+                    ],
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS"
+                    },
+                    "sku": {
+                        "name": "S3",
+                        "tier": "Standard"
+                    }
+                },
+                {
+                    "condition": "[equals(parameters('provisionSqlServer'), bool('true'))]",
+                    "name": "[parameters('laDatabaseName')]",
                     "type": "databases",
                     "apiVersion": "2019-06-01-preview",
                     "location": "[parameters('location')]",
@@ -539,6 +587,13 @@
                                 ,' -dbPassword ',parameters('dbPassword')
                                 ,' -appUserPassword ',parameters('appUserPassword')
                                 ,' -vmName ',parameters('virtualMachineName')
+                                ,' -laDBServerName '
+                                    , if(equals(parameters('provisionSqlServer'), bool('false'))
+                                        , parameters('laServerName')
+                                        , reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
+                                ,' -laDBName ', parameters('laDatabaseName')
+                                ,' -laDBUserName ', if(equals(parameters('provisionSqlServer'), bool('false')), parameters('laUserName'), parameters('dbUserName'))
+                                ,' -laDBPassword ', if(equals(parameters('provisionSqlServer'), bool('false')), parameters('laPassword'), parameters('dbPassword'))
                                 )]"
                         }
                     }
@@ -562,6 +617,14 @@
         "SQL User": {
             "type": "string",
             "value": "[parameters('dbUserName')]"
+        },
+        "LA Database": {
+            "type": "string",
+            "value": "[parameters('laDatabaseName')]"
+        },
+        "LA DB User": {
+            "type": "string",
+            "value": "[if(equals(parameters('provisionSqlServer'), bool('false')), parameters('laUserName'), parameters('dbUserName'))]"
         },
         "App URL Link": {
             "type": "string",

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SilentConfig>
   <InstallerConfiguration>
-    <ProductsToInstall>NTA</ProductsToInstall>
+    <ProductsToInstall>OrionLogManager</ProductsToInstall>
     <AdvancedInstallMode>True</AdvancedInstallMode>
     <SkipConfigurationWizardRun>False</SkipConfigurationWizardRun>
   </InstallerConfiguration>
@@ -37,22 +37,22 @@
         <SkipHTTPBinding>false</SkipHTTPBinding>
         <DefaultAdminPassword></DefaultAdminPassword>
       </Website>
-      <NetFlowConfiguration>
-        <FlowStorageConfig>
+      <OrionLogConfiguration>
+        <StorageConfig>
           <CreateNewDatabase>false</CreateNewDatabase>
-          <DatabaseName>SolarWindsNtaDatabase</DatabaseName>
+          <DatabaseName>SolarWindsLaDatabase</DatabaseName>
           <ServerName></ServerName>
           <UseSQLSecurity>true</UseSQLSecurity>
           <User>orionadmin</User>
           <UserPassword></UserPassword>
           <AccountType>NewSql</AccountType>
-          <Account>SolarWindsNtaDatabaseUser</Account>
+          <Account>SolarWindsLaDatabaseUser</Account>
           <AccountPassword></AccountPassword>
-        </FlowStorageConfig>
-      </NetFlowConfiguration>
+        </StorageConfig>
+      </OrionLogConfiguration>
     </Info>
   </Host>
   <Plugins>
-    <Plugin Assembly="SolarWinds.ConfigurationWizard.Plugin.NetFlow" FactoryType="SolarWinds.ConfigurationWizard.Plugin.NetFlow.SilentMode.NetFlowSilentConfigureFactory" />
+    <Plugin FactoryType="SolarWinds.ConfigurationWizard.Plugin.LogMgmt.SilentConfigureFactory" Assembly="SolarWinds.ConfigurationWizard.Plugin.LogMgmt"/>
   </Plugins>
 </SilentConfig>

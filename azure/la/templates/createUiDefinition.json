@@ -16,8 +16,8 @@
 						"name": "appName",
 						"type": "Microsoft.Common.TextBox",
 						"label": "Virtual Machine name",
-						"toolTip": "Choose a name for virtual machine where Network Configuration Manager (NCM) will be deployed.",
-						"defaultValue": "ncmserver",
+						"toolTip": "Choose a name for virtual machine where Log Analyzer (LA) will be deployed.",
+						"defaultValue": "laserver",
 						"constraints": {
 							"required": true,
 							"regex": "^[a-z0-9A-Z-]{3,79}$",
@@ -344,6 +344,100 @@
 				]
 			},
 			{
+				"name": "LADatabaseSettings",
+				"label": "LA Database Settings",
+				"subLabel": {
+					"preValidation": "LA Database settings",
+					"postValidation": "Done!"
+				},
+				"bladeTitle": "LA Database Settings",
+				"elements": [
+					{
+						"name": "LAAzureSqlDbDetails",
+						"type": "Microsoft.Common.Section",
+						"elements": [
+							{
+								"name": "ShowLADatabaseInformation",
+								"type": "Microsoft.Common.TextBlock",
+								"options": {
+									"text": "A 'Standard S3' Azure SQL database will be created for Log Analyzer (LA) under the same SQL Server as Orion Database and might be accessed using the same username and password."
+								}
+							},
+							{
+								"name": "ShowExpressTextSecond",
+								"type": "Microsoft.Common.TextBlock",
+								"options": {
+									"text": "Upgrading the Azure SQL database tier may be done at any time through the Microsoft Azure Portal and does not require any changes to Network Traffic Analyzer."
+								}
+							}
+						],
+						"visible": "[steps('DatabaseSettings').installationtype]"
+					},
+					{
+						"name": "LADbDetails",
+						"type": "Microsoft.Common.Section",
+						"label": "Enter LA Database details",
+						"elements": [
+							{
+								"name": "ShowDBConnectionTest",
+								"type": "Microsoft.Common.TextBlock",
+								"options": {
+									"text": "Existing Azure SQL DB or SQL Server connection information:"
+								}
+							},
+							{
+								"name": "laServerName",
+								"type": "Microsoft.Common.TextBox",
+								"label": "LA DB Server Name (FQDN)",
+								"toolTip": "Provide a Fully Qualified SQL server name. This must be an existing SQL server.",
+								"constraints": {
+									"regex": "([^.]*\\.){3}",
+									"required": true,
+									"validationMessage": "The SQL Server Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only alongwith FQDN (e.g database.windows.net). The SQL server should be an existing server."
+								}
+							},
+							{
+								"name": "laDatabaseName",
+								"type": "Microsoft.Common.TextBox",
+								"label": "LA Database Name",
+								"toolTip": "Provide Log Analyzer (LA) database name.",
+								"constraints": {
+									"regex": "^(?!master$|model$|msdb$|tempdb$|pdwtempdb$|pdwtempdb1$|pdwtempdb2$|DWConfiguration$|DWDiagnostics$|DWQueue$)[^.]{1,128}$",
+									"required": true,
+									"validationMessage": "The Database Name should be maximum 128 characters long and should not contain reserved words (like master, model, tempdb, etc.)"
+								}
+							},
+							{
+								"name": "laUserName",
+								"type": "Microsoft.Common.TextBox",
+								"label": "LA DB Server Admin username",
+								"toolTip": "Provide Log Analyzer (LA) server admin user name.",
+								"constraints": {
+									"regex": "^(?!admin$|administrator$|sa$|root$|dbmanager$|loginmanager$|dbo$|guest$|information_schema$|sys$|db_accessadmin$|db_backupoperator$|db_datareader$|db_datawriter$|db_ddladmin$|db_denydatareader$|db_denydatawriter$|db_owner$|db_securityadmin$|public$|@|\\$|[0-9])[a-z0-9A-Z-_!@$^]{3,79}$",
+									"required": true,
+									"validationMessage": "Make sure your login name meets the following requirements - It's a SQL Identifier, and not a typical system name (like admin, administrator, sa, root, dbmanager, loginmanager, etc.), or a built-in database user or role (like dbo, guest, public, etc.). Make sure your name doesn't contain whitespaces, unicode characters, or nonalphabetic characters, and that it doesn't begin with numbers or symbols."
+								}
+							},
+							{
+								"name": "laPassword",
+								"type": "Microsoft.Common.PasswordBox",
+								"toolTip": "Provide Log Analyzer (LA) server admin password.",
+								"label": {
+									"password": "Password",
+									"confirmPassword": "Confirm password"
+								},
+								"constraints": {
+									"required": true,
+									"regex": "^(((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]))|((?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]))|((?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])))(?=.{12,128})",
+									"validationMessage": "Your password must be at least 12 characters in length. Your password must contain characters from three of the following categories English uppercase letters, English lowercase letters, numbers (0-9), and non-alphanumeric characters (!, $, #, %, etc.)"
+								}
+							}
+						],
+						"visible": "[not(steps('DatabaseSettings').installationtype)]"
+					}
+				]
+			},
+			{
 				"name": "OrionInstallation",
 				"label": "Orion Installation",
 				"subLabel": {
@@ -358,7 +452,7 @@
 							"password": "Orion Web Console \"Admin\" Password",
 							"confirmPassword": "Confirm \"Admin\" password"
 						},
-						"toolTip": "Create NCM application password to access Orion Web Console for \"Admin\" user",
+						"toolTip": "Create LA application password to access Orion Web Console for \"Admin\" user",
 						"constraints": {
 							"required": true
 						}
@@ -422,6 +516,10 @@
 			"databaseName": "[steps('DatabaseSettings').AzureDbDetails.databaseName]",
 			"dbUserName": "[steps('DatabaseSettings').dbUserName]",
 			"dbPassword": "[steps('DatabaseSettings').dbPassword]",
+			"laServerName": "[steps('LADatabaseSettings').LADbDetails.laServerName]",
+			"laDatabaseName": "[steps('LADatabaseSettings').LADbDetails.laDatabaseName]",
+			"laUserName": "[steps('LADatabaseSettings').LADbDetails.laUserName]",
+			"laPassword": "[steps('LADatabaseSettings').LADbDetails.laPassword]",
 			"windowsLicenseType": "[steps('OSDetails').saveMoney.windowsLicenseType]"
 		}
 	}

@@ -16,7 +16,7 @@
 						"name": "appName",
 						"type": "Microsoft.Common.TextBox",
 						"label": "Virtual Machine name",
-						"toolTip": "Choose a name for virtual machine where Orion will be deployed.",
+						"toolTip": "Choose a name for virtual machine where Server Configuration Monitor (SCM) will be deployed.",
 						"defaultValue": "scmserver",
 						"constraints": {
 							"required": true,

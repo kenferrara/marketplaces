@@ -3,80 +3,97 @@
 	"handler": "Microsoft.Compute.MultiVm",
 	"version": "0.1.2-preview",
 	"parameters": {
-		"basics": [
-			{
-				"name": "appLabel",
-				"type": "Microsoft.Common.InfoBox",
-				"visible": true,
-				"options": {
-					"icon": "Info",
-					"text": "User Device Tracker"
-				}
-			},
-			{
-				"name": "appName",
-				"type": "Microsoft.Common.TextBox",
-				"label": "App Name",
-				"toolTip": "Orion Web Console will be accessed via https://[appname]:8787/orion",
-				"defaultValue": "udtserver",
-				"constraints": {
-					"required": true,
-					"regex": "^[a-z0-9A-Z-]{3,79}$",
-					"validationMessage": "The App Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only."
-				}
-			},
-			{
-				"name": "appUserPassword",
-				"type": "Microsoft.Common.PasswordBox",
-				"label": {
-					"password": "Create Password for Orion Web Console \"Admin\" User",
-					"confirmPassword": "Confirm password"
-				},
-				"toolTip": "Create UDT application password to access Orion Web Console for \"Admin\" user",
-				"constraints": {
-					"required": true
-				},
-				"options": {
-					"hideConfirmation": true
-				}
-			}
-		],
-		"steps": [
-			{
-				"name": "InfrastructureInformation",
-				"label": "Infrastructure Information",
+		"basics": [],
+		"steps": [{
+				"name": "AzureVM",
+				"label": "Virtual Machine Settings",
 				"subLabel": {
-					"preValidation": "Provide infrastructure information",
+					"preValidation": "Customize Virtual Machine Parameters",
 					"postValidation": "Done!"
 				},
-				"bladeTitle": "Settings",
+				"bladeTitle": "Virtual Machine Settings",
+				"elements": [{
+						"name": "appName",
+						"type": "Microsoft.Common.TextBox",
+						"label": "Virtual Machine name",
+						"toolTip": "Choose a name for virtual machine where User Device Tracker (UDT) will be deployed.",
+						"defaultValue": "udtserver",
+						"constraints": {
+							"required": true,
+							"regex": "^[a-z0-9A-Z-]{3,79}$",
+							"validationMessage": "The Virtual Machine name must be between 3 and 79 characters long and contain letters, numbers and hyphens only."
+						}
+					},
+					{
+						"name": "virtualMachineSize",
+						"type": "Microsoft.Compute.SizeSelector",
+						"label": "Virtual Machine size",
+						"toolTip": "The size of virtual machine to provision for the application.",
+						"recommendedSizes": [
+							"Standard_DS3_v2"
+						],
+						"osPlatform": "Windows"
+					},
+					{
+						"name": "osDiskType",
+						"type": "Microsoft.Common.DropDown",
+						"label": "OS Disk type",
+						"defaultValue": "Standard HDD",
+						"toolTip": "You can choose between Azure managed disks types to support your workload or scenario. Learn more about managed disk types.",
+						"constraints": {
+							"allowedValues": [{
+									"label": "Standard SSD",
+									"value": "StandardSSD_LRS"
+								},
+								{
+									"label": "Standard HDD",
+									"value": "Standard_LRS"
+								}
+							],
+							"required": true
+						},
+						"visible": true
+					}
+				]
+			},
+			{
+				"name": "OSDetails",
+				"label": "Operating System Details",
+				"subLabel": {
+					"preValidation": "Provide OS details",
+					"postValidation": "Done!"
+				},
+				"bladeTitle": "Operating System Details",
 				"elements": [
 					{
-						"name": "virtualMachineNameLabel",
-						"type": "Microsoft.Common.TextBlock",
-						"options": {
-							"text": "Virtual Machine Name:",
-							"link": {
-								"label": "[basics('appName')]",
-								"uri": ""
-							}
+						"name": "image",
+						"type": "Microsoft.Common.DropDown",
+						"label": "Image",
+						"toolTip": "The OS version of virtual machine to provision for the VM.",
+						"defaultValue": "Windows Server 2019 Datacenter",
+						"constraints": {
+							"allowedValues": [{
+									"label": "Windows Server 2016 Datacenter",
+									"value": "2016-Datacenter"
+								},
+								{
+									"label": "Windows Server 2019 Datacenter",
+									"value": "2019-Datacenter"
+								}
+							],
+							"required": true
 						},
 						"visible": true
 					},
 					{
-						"name": "vmCredentials",
-						"label": "Azure Managed Application",
-						"bladeTitle": "Application credentials"
-					},
-					{
 						"name": "adminUserName",
 						"type": "Microsoft.Compute.UserNameTextBox",
-						"label": "VM UserName",
+						"label": "Windows Admin Username",
 						"osPlatform": "Windows",
 						"constraints": {
 							"required": true
 						},
-						"toolTip": "Provide admin user name for the virtual machine"
+						"toolTip": "Provide admin username for the virtual machine"
 					},
 					{
 						"name": "vmPwd",
@@ -99,116 +116,44 @@
 						"visible": true
 					},
 					{
-						"name": "virtualMachineSize",
-						"type": "Microsoft.Compute.SizeSelector",
-						"label": "Virtual machine size",
-						"toolTip": "The size of virtual machine to provision for the application.",
-						"recommendedSizes": [
-							"Standard_DS4_v2"
-						],
-						"osPlatform": "Windows"
-					},
-					{
-						"name": "SizeRecommendation",
-						"type": "Microsoft.Common.InfoBox",
-						"options": {
-							"icon": "Info",
-							"text": "Recommended size: \n Standard DS4v2"
-						}
-					}
-				]
-			},
-			{
-				"name": "OSDetails",
-				"label": "Operating System Details",
-				"subLabel": {
-					"preValidation": "Provide OS details",
-					"postValidation": "Done!"
-				},
-				"bladeTitle": "Settings",
-				"elements": [
-					{
-						"name": "image",
-						"type": "Microsoft.Common.DropDown",
-						"label": "Image",
-						"toolTip": "The OS version of virtual machine to provision for the VM.",
-						"defaultValue": "Windows Server 2019 Datacenter",
-						"constraints": {
-							"allowedValues": [
-								{
-									"label": "Windows Server 2016 Datacenter",
-									"value": "2016-Datacenter"
+                        "name": "saveMoney",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Save Money",
+                        "elements": [
+							{
+								"name": "licenseText",
+								"type": "Microsoft.Common.TextBlock",
+								"options": {
+									"text": "Save up to 49% with a license you already own using Azure Hybrid Benefit.",
+									"link": {
+										"label": "Learn more",
+										"uri": "https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing"
+									}
 								},
-								{
-									"label": "Windows Server 2019 Datacenter",
-									"value": "2019-Datacenter"
-								}
-							],
-							"required": true
-						},
-						"visible": true
-					},
-					{
-						"name": "osDiskType",
-						"type": "Microsoft.Common.DropDown",
-						"label": "OS Disk type",
-						"defaultValue": "Standard HDD",
-						"toolTip": "You can choose between Azure managed disks types to support your workload or scenario. Learn more about managed disk types.",
-						"constraints": {
-							"allowedValues": [
-								{
-									"label": "Standard SSD",
-									"value": "StandardSSD_LRS"
+								"visible": true
+							},
+							{
+								"name": "windowsLicenseType",
+								"type": "Microsoft.Common.OptionsGroup",
+								"label": "Already have a Windows license?",
+								"defaultValue": "No",
+								"toolTip": "If you own Windows licenses with active Software Assurance (SA) or have an active Windows Server subscription, use Azure Hybrid Benefit to save compute cost.",
+								"constraints": {
+									"allowedValues": [{
+											"label": "Yes",
+											"value": "yes"
+										},
+										{
+											"label": "No",
+											"value": "no"
+										}
+									]
 								},
-								{
-									"label": "Standard HDD",
-									"value": "Standard_LRS"
-								}
-							],
-							"required": true
-						},
-						"visible": true
-					},
-					{
-						"name": "licenseTextSaveMoney",
-						"type": "Microsoft.Common.TextBlock",
-						"options": {
-							"text": "SAVE MONEY"
-						},
-						"visible": true
-					},
-					{
-						"name": "licenseText",
-						"type": "Microsoft.Common.TextBlock",
-						"options": {
-							"text": "Save up to 49% with a license you already own using Azure Hybrid Benefit.",
-							"link": {
-								"label": "Learn more",
-								"uri": "https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing"
+								"visible": true
 							}
-						},
-						"visible": true
-					},
-					{
-						"name": "windowsLicenseType",
-						"type": "Microsoft.Common.OptionsGroup",
-						"label": "Already have a Windows license?",
-						"defaultValue": "No",
-						"toolTip": "If you own Windows licenses with active Software Assurance (SA) or have an active Windows Server subscription, use Azure Hybrid Benefit to save compute cost.",
-						"constraints": {
-							"allowedValues": [
-								{
-									"label": "Yes",
-									"value": "yes"
-								},
-								{
-									"label": "No",
-									"value": "no"
-								}
-							]
-						},
-						"visible": true
-					}
+                        ],
+                        "visible": true
+                    }
 				]
 			},
 			{
@@ -218,9 +163,8 @@
 					"preValidation": "Network Settings",
 					"postValidation": "Done!"
 				},
-				"bladeTitle": "Settings",
-				"elements": [
-					{
+				"bladeTitle": "Network Settings",
+				"elements": [{
 						"name": "virtualNetwork",
 						"type": "Microsoft.Network.VirtualNetworkCombo",
 						"label": {
@@ -232,20 +176,20 @@
 							"subnets": "Subnets for the virtual network"
 						},
 						"defaultValue": {
-							"name": "VirtualNetwork",
+							"name": "vnet-orion",
 							"addressPrefixSize": "/24"
 						},
 						"constraints": {
 							"minAddressPrefixSize": "/24"
 						},
 						"options": {
-							"hideExisting": true
+							"hideExisting": false
 						},
 						"subnets": {
 							"subnet1": {
 								"label": "Subnet",
 								"defaultValue": {
-									"name": "Subnet-1",
+									"name": "snet-orion",
 									"addressPrefixSize": "/24"
 								},
 								"constraints": {
@@ -260,16 +204,16 @@
 						"name": "publicIpAddress",
 						"type": "Microsoft.Network.PublicIpAddressCombo",
 						"label": {
-							"publicIpAddress": "Public IP Address for the VM",
-							"domainNameLabel": "DNS Prefix for the public IP Address"
+							"publicIpAddress": "Public IP address for the VM",
+							"domainNameLabel": "DNS Prefix for the public IP address"
 						},
 						"toolTip": {
-							"publicIpAddress": "Public IP Address for the VM",
-							"domainNameLabel": "DNS Prefix for the public IP Address, must be globally unique"
+							"publicIpAddress": "Public IP address for the VM.",
+							"domainNameLabel": "DNS Prefix for the public IP address must be globally unique. Orion Web Console will be accessible via https://[dnsname]:8787/Orion"
 						},
 						"defaultValue": {
-							"publicIpAddressName": "[concat(basics('appName'), '-ip')]",
-							"domainNameLabel": "[concat(basics('appName'), '-', take(replace(guid(), '-', ''), 10))]"
+							"publicIpAddressName": "[concat(steps('AzureVM').appName, '-ip')]",
+							"domainNameLabel": "[concat(steps('AzureVM').appName, '-', take(replace(guid(), '-', ''), 10))]"
 						},
 						"options": {
 							"hideExisting": false,
@@ -284,52 +228,21 @@
 				]
 			},
 			{
-				"name": "OrionInstallationType",
-				"label": "Orion Installation",
+				"name": "DatabaseSettings",
+				"label": "Database Settings",
 				"subLabel": {
-					"preValidation": "Orion Installation",
+					"preValidation": "Database settings",
 					"postValidation": "Done!"
 				},
-				"bladeTitle": "Orion Installation",
-				"elements": [
-					{
-						"name": "ScalabilityEngine",
-						"type": "Microsoft.Common.OptionsGroup",
-						"label": "Support scalability Engine",
-						"defaultValue": "No",
-						"toolTip": "Checking \"Yes\", TCP inbound ports 1801, 5671, and 17777 are enabled",
-						"constraints": {
-							"allowedValues": [
-								{
-									"label": "No",
-									"value": "No"
-								},
-								{
-									"label": "Yes",
-									"value": "Yes"
-								}
-							],
-							"required": true
-						},
-						"visible": true
-					},
-					{
-						"name": "ScalabilityEngineText",
-						"type": "Microsoft.Common.TextBlock",
-						"options": {
-							"text": "Checking \"Yes\": TCP ports 1801, 5671, and 17777 are enabled by default on Virtual Machine to support Scalablity / Poller Engine"
-						},
-						"visible": true
-					},
-					{
+				"bladeTitle": "Database Settings",
+				"elements": [{
 						"name": "installationtype",
 						"type": "Microsoft.Common.OptionsGroup",
 						"label": "Installation Type",
 						"defaultValue": "Azure SQL DB",
 						"toolTip": "Select Installation Type",
 						"constraints": {
-							"allowedValues": [
-								{
+							"allowedValues": [{
 									"label": "Azure SQL DB",
 									"value": true
 								},
@@ -343,33 +256,31 @@
 						"visible": true
 					},
 					{
-						"name": "ShowExpressTextFirst",
-						"type": "Microsoft.Common.TextBlock",
-						"visible": "[steps('OrionInstallationType').installationtype]",
-						"options": {
-							"text": "Orion will create a 'Standard S3' tier Azure SQL database \nwhich is recommended for most evaluations."
-						}
-					},
-					{
-						"name": "ShowExpressTextSecond",
-						"type": "Microsoft.Common.TextBlock",
-						"visible": "[steps('OrionInstallationType').installationtype]",
-						"options": {
-							"text": "Upgrading the Azure SQL database tier may be done any time through the Microsoft Azure Portal and does not require any changes to Orion "
-						}
-					},
-					{
-						"name": "ShowExpressTextThird",
-						"type": "Microsoft.Common.TextBlock",
-						"visible": "[steps('OrionInstallationType').installationtype]",
-						"options": {
-							"text": "Create User Name and Password to access Orion Database"
-						}
+						"name": "AzureSqlDbDetails",
+						"type": "Microsoft.Common.Section",
+						"label": "Enter Azure SQL DB details",
+						"elements": [
+							{
+								"name": "ShowExpressTextFirst",
+								"type": "Microsoft.Common.TextBlock",
+								"options": {
+									"text": "Orion will create a 'Standard S3' tier Azure SQL database \nwhich is recommended for most evaluations."
+								}
+							},
+							{
+								"name": "ShowExpressTextSecond",
+								"type": "Microsoft.Common.TextBlock",
+								"options": {
+									"text": "Upgrading the Azure SQL database tier may be done at any time through the Microsoft Azure Portal and does not require any changes to Orion."
+								}
+							}
+						],
+						"visible": "[steps('DatabaseSettings').installationtype]"
 					},
 					{
 						"name": "AzureDbDetails",
 						"type": "Microsoft.Common.Section",
-						"label": "Enter Microsoft SQL Server details",
+						"label": "Enter Orion Database details",
 						"elements": [
 							{
 								"name": "ShowDBConnectionTest",
@@ -381,19 +292,19 @@
 							{
 								"name": "dbServerName",
 								"type": "Microsoft.Common.TextBox",
-								"label": "DB Server Name (Fully Qualified)",
-								"toolTip": "Fully qualified SQL server name. This should be an existing SQL server.",
+								"label": "DB Server Name (FQDN)",
+								"toolTip": "Provide a Fully Qualified SQL Server name. This must be an existing SQL Server.",
 								"constraints": {
 									"regex": "([^.]*\\.){3}",
 									"required": true,
-									"validationMessage": "The SQL Server Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only alongwith FQDN(e.g database.windows.net). The sql server should be an existing server."
+									"validationMessage": "The SQL Server Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only alongwith FQDN (e.g database.windows.net). The SQL server should be an existing server."
 								}
 							},
 							{
 								"name": "databaseName",
 								"type": "Microsoft.Common.TextBox",
 								"label": "Database Name",
-								"toolTip": "Provide database name",
+								"toolTip": "Provide Orion database name.",
 								"constraints": {
 									"regex": "^(?!master$|model$|msdb$|tempdb$|pdwtempdb$|pdwtempdb1$|pdwtempdb2$|DWConfiguration$|DWDiagnostics$|DWQueue$)[^.]{1,128}$",
 									"required": true,
@@ -401,13 +312,13 @@
 								}
 							}
 						],
-						"visible": "[not(steps('OrionInstallationType').installationtype)]"
+						"visible": "[not(steps('DatabaseSettings').installationtype)]"
 					},
 					{
 						"name": "dbUserName",
 						"type": "Microsoft.Common.TextBox",
-						"label": "Server admin login",
-						"toolTip": "Provide user name",
+						"label": "DB Server Admin User Name",
+						"toolTip": "Provide database server admin user name.",
 						"constraints": {
 							"regex": "^(?!admin$|administrator$|sa$|root$|dbmanager$|loginmanager$|dbo$|guest$|information_schema$|sys$|db_accessadmin$|db_backupoperator$|db_datareader$|db_datawriter$|db_ddladmin$|db_denydatareader$|db_denydatawriter$|db_owner$|db_securityadmin$|public$|@|\\$|[0-9])[a-z0-9A-Z-_!@$^]{3,79}$",
 							"required": true,
@@ -418,7 +329,7 @@
 					{
 						"name": "dbPassword",
 						"type": "Microsoft.Common.PasswordBox",
-						"toolTip": "Please provide the password",
+						"toolTip": "Provide database server admin password.",
 						"label": {
 							"password": "Password",
 							"confirmPassword": "Confirm password"
@@ -427,46 +338,91 @@
 							"required": true,
 							"regex": "^(((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]))|((?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]))|((?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])))(?=.{12,128})",
 							"validationMessage": "Your password must be at least 12 characters in length. Your password must contain characters from three of the following categories � English uppercase letters, English lowercase letters, numbers (0-9), and non-alphanumeric characters (!, $, #, %, etc.)"
- 
-
-						},
-						"options": {
-							"hideConfirmation": true
 						},
 						"visible": true
 					}
+				]
+			},
+			{
+				"name": "OrionInstallation",
+				"label": "Orion Installation",
+				"subLabel": {
+					"preValidation": "Orion Installation",
+					"postValidation": "Done!"
+				},
+				"bladeTitle": "Orion Installation",
+				"elements": [{
+						"name": "appUserPassword",
+						"type": "Microsoft.Common.PasswordBox",
+						"label": {
+							"password": "Orion Web Console \"Admin\" Password",
+							"confirmPassword": "Confirm \"Admin\" password"
+						},
+						"toolTip": "Create UDT application password to access Orion Web Console for \"Admin\" user",
+						"constraints": {
+							"required": true
+						}
+					},
+					{
+						"name": "ScalabilityEngine",
+						"type": "Microsoft.Common.OptionsGroup",
+						"label": "Support scalability Engine",
+						"defaultValue": "No",
+						"toolTip": "Checking \"Yes\", TCP inbound ports 1801, 5671, and 17777 are enabled",
+						"constraints": {
+							"allowedValues": [{
+									"label": "No",
+									"value": "No"
+								},
+								{
+									"label": "Yes",
+									"value": "Yes"
+								}
+							],
+							"required": true
+						},
+						"visible": true
+					},
+					{
+                        "name": "infoMessage",
+                        "type": "Microsoft.Common.InfoBox",
+                        "visible": true,
+                        "options": {
+                            "icon": "Info",
+                            "text": "If \"Yes\" is selected, TCP ports 1801, 5671, and 17777 will be opened on Virtual Machine to support Scalablity / Poller Engine"
+                        }
+                    }
 				]
 			}
 		],
 		"outputs": {
 			"location": "[location()]",
-			"virtualMachineName": "[basics('appName')]",
-			"appUserPassword": "[basics('appUserPassword')]",
-			"adminUsername": "[steps('InfrastructureInformation').adminUserName]",
-			"adminPassword": "[steps('InfrastructureInformation').vmPwd.password]",
+			"virtualMachineName": "[steps('AzureVM').appName]",
+			"adminUsername": "[steps('OSDetails').adminUserName]",
+			"adminPassword": "[steps('OSDetails').vmPwd.password]",
 			"image": "[steps('OSDetails').image]",
-			"virtualMachineSize": "[steps('InfrastructureInformation').virtualMachineSize]",
-			"osDiskType": "[steps('OSDetails').osDiskType]",
+			"virtualMachineSize": "[steps('AzureVM').virtualMachineSize]",
+			"osDiskType": "[steps('AzureVM').osDiskType]",
 			"virtualNetworkNewOrExisting": "[steps('NetworkSettings').virtualNetwork.newOrExisting]",
 			"virtualNetworkName": "[steps('NetworkSettings').virtualNetwork.name]",
 			"addressPrefixes": "[steps('NetworkSettings').virtualNetwork.addressPrefixes]",
 			"subnetName": "[steps('NetworkSettings').virtualNetwork.subnets.subnet1.name]",
 			"subnetPrefix": "[steps('NetworkSettings').virtualNetwork.subnets.subnet1.addressPrefix]",
-			"virtualNetworkRG": "[steps('NetworkSettings').virtualNetwork.resourceGroup]",		
+			"virtualNetworkRG": "[steps('NetworkSettings').virtualNetwork.resourceGroup]",
 			"publicIpNewOrExisting": "[steps('NetworkSettings').publicIpAddress.newOrExistingOrNone]",
 			"publicIpAddressName": "[steps('NetworkSettings').publicIpAddress.name]",
 			"publicIpDns": "[steps('NetworkSettings').publicIpAddress.domainNameLabel]",
 			"publicIpResourceGroupName": "[steps('NetworkSettings').publicIpAddress.resourceGroup]",
 			"publicIpAddressType": "[steps('NetworkSettings').publicIpAddress.publicIPAllocationMethod]",
 			"publicIpAddressSku": "[steps('NetworkSettings').publicIpAddress.sku]",
-			"ScalabilityEngine": "[steps('OrionInstallationType').ScalabilityEngine]",
-			"provisionSqlServer": "[steps('OrionInstallationType').installationtype]",
-			"dbServerName": "[steps('OrionInstallationType').AzureDbDetails.dbServerName]",
-			"databaseName": "[steps('OrionInstallationType').AzureDbDetails.databaseName]",
-			"dbUserName": "[steps('OrionInstallationType').dbUserName]",
-			"dbPassword": "[steps('OrionInstallationType').dbPassword]",
-			
-			"windowsLicenseType": "[steps('OSDetails').windowsLicenseType]"
+			"appUserPassword": "[steps('OrionInstallation').appUserPassword]",
+			"ScalabilityEngine": "[steps('OrionInstallation').ScalabilityEngine]",
+			"provisionSqlServer": "[steps('DatabaseSettings').installationtype]",
+			"dbServerName": "[steps('DatabaseSettings').AzureDbDetails.dbServerName]",
+			"databaseName": "[steps('DatabaseSettings').AzureDbDetails.databaseName]",
+			"dbUserName": "[steps('DatabaseSettings').dbUserName]",
+			"dbPassword": "[steps('DatabaseSettings').dbPassword]",
+			"windowsLicenseType": "[steps('OSDetails').saveMoney.windowsLicenseType]"
 		}
 	}
 }
