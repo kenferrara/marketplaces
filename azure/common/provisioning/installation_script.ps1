@@ -11,9 +11,9 @@ param
 	[string]$ntaDBUserName,
 	[string]$ntaDBPassword,
 	[string]$laDBServerName,
-    [string]$laDBName,
-    [string]$laDBUserName,
-    [string]$laDBPassword,
+	[string]$laDBName,
+	[string]$laDBUserName,
+	[string]$laDBPassword,
 	[string]$appUserPassword,
 	[string]$vmName
 )
@@ -96,12 +96,12 @@ if ($xml.SilentConfig.Host.Info.NetFlowConfiguration.FlowStorageConfig) {
 }
 
 if ($xml.SilentConfig.Host.Info.OrionLogConfiguration.StorageConfig) {
-    $nodeStorageConfig = $xml.SilentConfig.Host.Info.OrionLogConfiguration.StorageConfig
-    $nodeStorageConfig.ServerName = $laDBServerName
-    $nodeStorageConfig.DatabaseName = $laDBName
-    $nodeStorageConfig.User = $laDBUserName
-    $nodeStorageConfig.UserPassword = $laDBPassword
-    $nodeStorageConfig.AccountPassword = $laDBPassword
+	$nodeStorageConfig = $xml.SilentConfig.Host.Info.OrionLogConfiguration.StorageConfig
+	$nodeStorageConfig.ServerName = $laDBServerName
+	$nodeStorageConfig.DatabaseName = $laDBName
+	$nodeStorageConfig.User = $laDBUserName
+	$nodeStorageConfig.UserPassword = $laDBPassword
+	$nodeStorageConfig.AccountPassword = $laDBPassword
 }
 
 if ($xml.SilentConfig.Host.Info.Website) {

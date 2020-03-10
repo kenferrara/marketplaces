@@ -44,20 +44,20 @@ $AzureDeployParametersFilePath = "$WorkFolder\$AzureDeployParametersFileName"
 $UiDefinitionFilePath = "$WorkFolder\$UiDefinitionFileName"
 
 $ProductNames = @{
-    WPM = "Web Performance Monitor"
+    WPM  = "Web Performance Monitor"
     VNQM = "VoIP & Network Quality Manager"
-    LA = "Log Analyzer"
-    NCM = "Network Configuration Manager"
+    LA   = "Log Analyzer"
+    NCM  = "Network Configuration Manager"
     VMAN = "Virtualization Manager"
-    SRM = "Storage Resource Monitor"
-    NPM = "Network Performance Monitor";
-    NTA = "NetFlow Traffic Analyzer";
-    UDT = "User Device Tracker";
+    SRM  = "Storage Resource Monitor"
+    NPM  = "Network Performance Monitor";
+    NTA  = "NetFlow Traffic Analyzer";
+    UDT  = "User Device Tracker";
     IPAM = "IP Address Manager";
-    ETS = "Engineers Toolset";
-    SAM = "Server & Application Monitor";
-    EOC = "Enterprise Operations Console";
-    SCM = "Server Configuration Monitor";
+    ETS  = "Engineers Toolset";
+    SAM  = "Server & Application Monitor";
+    EOC  = "Enterprise Operations Console";
+    SCM  = "Server Configuration Monitor";
 }
 
 if (-not $ResourceGroupName) {

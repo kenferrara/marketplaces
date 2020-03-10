@@ -12,4 +12,4 @@ if (-not $Parameters) {
 }
 
 ConvertTo-PoshstacheTemplate -InputFile $TemplatePath -ParametersObject $Parameters `
-    | Out-File $OutputFile -Force -Encoding "UTF8"
+| Out-File $OutputFile -Force -Encoding "UTF8"
