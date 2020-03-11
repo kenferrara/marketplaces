@@ -1,6 +1,6 @@
 # Azure Orion ARM Templates
 
-Each of products in this repository has 2 main files needed for deployment:
+Each of products in this repository has following files necessary for deployment:
 * mainTemplate.json - ARM template
 * createUiDefinition.json - definition of UI for Markeplace offer
 * config/standard.xml - configuration file for silent installer
