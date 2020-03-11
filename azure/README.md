@@ -34,7 +34,7 @@ It also might prepare a \*.zip file for you containing all files for deployment 
 
 ### Example
 
-To build a package for SCM you can invoke for example as here:
+*Building a package for SCM*
 
 ```powershell
 .\BuildDeploy-AzTemplate.ps1 -Product scm -Password N0tS3cur3P4$$w0rd
