@@ -79,7 +79,7 @@ $xml.Load($configfilePath)
 
 if ($xml.SilentConfig.Host.Info.Database) {
 	$dbnode = $xml.SilentConfig.Host.Info.Database	
-	$dbnode.ServerName = $dbServerName
+	$dbnode.ServerName = "tcp:$dbServerName"
 	$dbnode.DatabaseName = $databaseName
 	$dbnode.User = $dbUserName    
 	$dbnode.UserPassword = $dbPassword
