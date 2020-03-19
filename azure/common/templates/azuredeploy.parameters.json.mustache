@@ -45,12 +45,14 @@
     "publicIpNewOrExisting": {
       "value": "new"
     },
+    {{! uncomment to define custom IP DNS name
     "publicIpAddressName": {
-      "value": "pip-{{product}}-test-{{location}}-001"
+      "value": "pip-{{product\}\}-test-{{location\}\}-001"
     },
     "publicIpDns": {
-      "value": "web-{{product}}-{{guid}}"
-    },
+      "value": "web-{{product\}\}-{{guid\}\}"
+    }, 
+    }}
     "publicIpResourceGroupName": {
       "value": "{{resourceGroup}}"
     },
@@ -96,12 +98,13 @@
     "appUserPassword": {
       "value": "{{password}}"
     },
+    {{! uncomment to define custom DB Server name and database
     "dbServerName": {
-      "value": "sqldb-{{product}}-test"
+      "value": "sqldb-{{product\}\}-test"
     },
     "databaseName": {
       "value": "SolarWindsOrionDatabase"
-    },
+    }, }}
     "dbUserName": {
       "value": "OrionAdmin"
     },

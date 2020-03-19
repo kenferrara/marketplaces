@@ -2,6 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "guidValue": {
+            "type": "string",
+            "defaultValue": "[newGuid()]"
+        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
@@ -53,14 +57,14 @@
         },
         "publicIpAddressName": {
             "type": "string",
-            "defaultValue": "{{product}}server-ip",
+            "defaultValue": "pip-{{product}}-{{location}}-001",
             "metadata": {
                 "description": "Public IP Address Name for the VM"
             }
         },
         "publicIpDns": {
             "type": "string",
-            "defaultValue": "[concat('{{product}}server-', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat('web-orion-', uniqueString(parameters('guidValue')))]",
             "metadata": {
                 "description": "DNS of the public ip address for the VM"
             }
@@ -88,7 +92,7 @@
         },
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "{{product}}server",
+            "defaultValue": "vmorion",
             "metadata": {
                 "description": "The name of the Virtual Machine."
             }
@@ -141,14 +145,14 @@
         },
         "dbServerName": {
             "type": "string",
-            "defaultValue": "[concat('oriondbserver', uniqueString(subscription().id, resourceGroup().id))]",
+            "defaultValue": "[concat('sql-orion-', uniqueString(parameters('guidValue')))]",
             "metadata": {
                 "description": "Provide server name for the azure sql"
             }
         },
         "databaseName": {
             "type": "string",
-            "defaultValue": "[concat('oriondatabase', uniqueString(subscription().id, resourceGroup().id))]",
+            "defaultValue": "[concat('sqldb-orion-', uniqueString(parameters('guidValue')))]",
             "metadata": {
                 "description": "Provide database name for the azure sql"
             }
@@ -170,14 +174,14 @@
         {{#additionalDatabase}}
         "{{product}}ServerName": {
             "type": "string",
-            "defaultValue": "[concat('oriondbserver', uniqueString(subscription().id, resourceGroup().id))]",
+            "defaultValue": "[parameters('dbServerName')]",
             "metadata": {
                 "description": "Provide server name for the azure sql"
             }
         },
         "{{product}}DatabaseName": {
             "type": "string",
-            "defaultValue": "[concat('{{product}}database', uniqueString(subscription().id, resourceGroup().id))]",
+            "defaultValue": "[concat('sqldb-{{product}}-', uniqueString(parameters('guidValue')))]",
             "metadata": {
                 "description": "Provide database name for the azure sql"
             }
@@ -319,7 +323,7 @@
     "resources": [
         {
             "apiVersion": "2019-09-01",
-            "name": "SolarWinds.Orion.{{productUpper}}",
+            "name": "pid-{{pid}}",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -608,6 +612,10 @@
         }
     ],
     "outputs": {
+        "guidOutput ": {
+            "type": "string",
+            "value": "[parameters('guidValue')]"
+        },
         "VM Name": {
             "type": "string",
             "value": "[parameters('virtualMachineName')]"
