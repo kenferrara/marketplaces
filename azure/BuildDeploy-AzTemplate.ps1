@@ -50,14 +50,31 @@ $ProductNames = @{
     NCM  = "Network Configuration Manager"
     VMAN = "Virtualization Manager"
     SRM  = "Storage Resource Monitor"
-    NPM  = "Network Performance Monitor";
-    NTA  = "NetFlow Traffic Analyzer";
-    UDT  = "User Device Tracker";
-    IPAM = "IP Address Manager";
-    ETS  = "Engineers Toolset";
-    SAM  = "Server & Application Monitor";
-    EOC  = "Enterprise Operations Console";
-    SCM  = "Server Configuration Monitor";
+    NPM  = "Network Performance Monitor"
+    NTA  = "NetFlow Traffic Analyzer"
+    UDT  = "User Device Tracker"
+    IPAM = "IP Address Manager"
+    ETS  = "Engineers Toolset"
+    SAM  = "Server & Application Monitor"
+    EOC  = "Enterprise Operations Console"
+    SCM  = "Server Configuration Monitor"
+}
+
+$Pids = @{
+    WPM  = "ccc98a6a-52d7-5732-b5f2-b7b65c1e5f64"
+    VNQM = "734e7dc9-3598-5246-bca1-7c6106b85a7b"
+    LA   = "c4e6c6de-2caf-5d0e-b7a2-b8a922c82980"
+    NCM  = "f8dff75c-61ff-5e7b-918e-dabfd5fce8e9"
+    VMAN = "0414b32b-e704-53e7-9c5c-b229f2466c39"
+    SRM  = "42788bdd-019f-5fb4-b396-79f750ea55bd"
+    NPM  = "0ddbda9d-a07e-515d-a763-91d5a32c3485"
+    NTA  = "d85d5c4f-1d76-59fb-bb1b-f42d010d0f88"
+    UDT  = "ec90767a-8959-5706-9ce1-3191f99f1dd2"
+    IPAM = "1b9cde35-7d9e-5169-8a81-ed3e6b594c5e"
+    ETS  = "7e7320b1-2d07-5d66-98d1-c0082eff0a0a"
+    SAM  = "1a25ce3f-5e14-5bd8-8e9b-70b7933b7ab4"
+    EOC  = "4a8bd992-b256-5f66-aac1-cdddf174c21f"
+    SCM  = "ee45e73f-5db8-5831-9a58-52aa236b27bb"
 }
 
 if (-not $ResourceGroupName) {
@@ -95,6 +112,8 @@ Copy-Item -Path ".\common\provisioning\*" -Destination $WorkFolder -Recurse
 
 $TemplateParameters = @"
 { 
+    pid: '$($Pids[$Product])',
+    location: '$Location',
     product: '$Product',
     productToInstall: '$(if($Product -eq 'la') { "OrionLogManager" } else { $Product.ToUpper() })',
     productFull: '$($ProductNames[$Product])', 
@@ -124,6 +143,7 @@ if ($BuildPackage) {
     $date = Get-Date -Format "yyyy_MM_dd"
     Get-ChildItem -Path $WorkFolder -Exclude $AzureDeployParametersFileName |
     Compress-Archive -DestinationPath "$outputPath\$Product-$date.zip" -Update
+    exit
 }
 
 if ($ParametersFile) {
