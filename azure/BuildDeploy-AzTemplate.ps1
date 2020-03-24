@@ -25,6 +25,16 @@ if (-not (Test-Path ".\SideLoad-AzCreateUIDefinition.ps1")) {
     Invoke-WebRequest "https://github.com/Azure/azure-quickstart-templates/raw/master/SideLoad-AzCreateUIDefinition.ps1" -UseBasicParsing -OutFile "SideLoad-AzCreateUIDefinition.ps1"
 }
 
+if (($VNetResourceGroupName -or $VnetName -or $SubnetName) -ne ($VNetResourceGroupName -and $VnetName -and $SubnetName)) {
+    Write-Host "You have to provide -VNetResourceGroupName, -VnetName and -SubnetName to use an existing Virtual Network"
+    exit
+}
+
+if (($PublicIpResourceGroupName -or $PublicIpAddressName -or $PublicIpDns) -ne ($PublicIpResourceGroupName -and $PublicIpAddressName -and $PublicIpDns)) {
+    Write-Host "You have to provide -PublicIpResourceGroupName, -PublicIpDns and -PublicIpAddressName to use an existing Public IP address"
+    exit
+}
+
 Write-Host "Building $($Product.ToUpper())..."
 $Product = $Product.ToLower()
 $Guid = New-Guid
@@ -113,7 +123,6 @@ Copy-Item -Path ".\common\provisioning\*" -Destination $WorkFolder -Recurse
 $TemplateParameters = @"
 { 
     pid: '$($Pids[$Product])',
-    location: '$Location',
     product: '$Product',
     productToInstall: '$(if($Product -eq 'la') { "OrionLogManager" } else { $Product.ToUpper() })',
     productFull: '$($ProductNames[$Product])', 
