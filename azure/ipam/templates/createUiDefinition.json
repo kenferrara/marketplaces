@@ -17,7 +17,7 @@
 						"type": "Microsoft.Common.TextBox",
 						"label": "Virtual Machine name",
 						"toolTip": "Choose a name for virtual machine where IP Address Manager (IPAM) will be deployed.",
-						"defaultValue": "ipamserver",
+						"defaultValue": "vmorionipam",
 						"constraints": {
 							"required": true,
 							"regex": "^[a-z0-9A-Z-]{3,79}$",
@@ -176,7 +176,7 @@
 							"subnets": "Subnets for the virtual network"
 						},
 						"defaultValue": {
-							"name": "vnet-orion",
+							"name": "[concat('vnet-orion-', location())]",
 							"addressPrefixSize": "/24"
 						},
 						"constraints": {
@@ -189,7 +189,7 @@
 							"subnet1": {
 								"label": "Subnet",
 								"defaultValue": {
-									"name": "snet-orion",
+									"name": "[concat('snet-orion-', location())]",
 									"addressPrefixSize": "/24"
 								},
 								"constraints": {
@@ -212,7 +212,7 @@
 							"domainNameLabel": "DNS Prefix for the public IP address must be globally unique. Orion Web Console will be accessible via https://[dnsname]:8787/Orion"
 						},
 						"defaultValue": {
-							"publicIpAddressName": "[concat(steps('AzureVM').appName, '-ip')]",
+							"publicIpAddressName": "[concat('pip-', steps('AzureVM').appName, '-', location())]",
 							"domainNameLabel": "[concat(steps('AzureVM').appName, '-', take(replace(guid(), '-', ''), 10))]"
 						},
 						"options": {

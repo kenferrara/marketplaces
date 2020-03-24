@@ -57,7 +57,7 @@
         },
         "publicIpAddressName": {
             "type": "string",
-            "defaultValue": "pip-ipam-westeurope-001",
+            "defaultValue": "[concat('pip-', parameters('virtualMachineName'), '-', resourceGroup().location)]",
             "metadata": {
                 "description": "Public IP Address Name for the VM"
             }
@@ -112,14 +112,14 @@
         },
         "virtualMachineSize": {
             "type": "string",
-            "defaultValue": "Standard_DS12_v2",
+            "defaultValue": "Standard_DS3_v2",
             "metadata": {
                 "description": "The size of virtual machine to provision for the application."
             }
         },
         "image": {
             "type": "string",
-            "defaultValue": "2016-Datacenter",
+            "defaultValue": "2019-Datacenter",
             "metadata": {
                 "description": "The OS version of virtual machine to provision for the VM."
             }
@@ -326,12 +326,13 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": "[if(not(equals(parameters('publicIpNewOrExisting'), 'none')), variables('publicIpAddressId') , json('null'))]"
                         }
-                    }
-                ]
+                    }],
+                "networkSecurityGroup": {	
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"	
+                }
             }
         },
         {
-            "condition": "[equals(parameters('virtualNetworkNewOrExisting'), 'new')]",
             "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-11-01",
@@ -346,9 +347,6 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": "[parameters('addressPrefixes')]"
@@ -357,10 +355,7 @@
                     {
                         "name": "[parameters('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('subnetPrefix')]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
+                            "addressPrefix": "[parameters('subnetPrefix')]"
                         }
                     }
                 ]
