@@ -70,6 +70,23 @@ $ProductNames = @{
     SCM  = "Server Configuration Monitor"
 }
 
+$ProductToInstall = @{
+    LA = "OrionLogManager"
+    ETS = "ToolsetWeb"
+}
+
+function Get-ProductToInstall {
+    param (
+        $Product
+    )
+
+    if ($ProductToInstall.ContainsKey($Product)) {
+        return $ProductToInstall[$Product]
+    } else {
+        return $Product.ToUpper()
+    }
+}
+
 $Pids = @{
     WPM  = "ccc98a6a-52d7-5732-b5f2-b7b65c1e5f64"
     VNQM = "734e7dc9-3598-5246-bca1-7c6106b85a7b"
@@ -124,7 +141,7 @@ $TemplateParameters = @"
 { 
     pid: '$($Pids[$Product])',
     product: '$Product',
-    productToInstall: '$(if($Product -eq 'la') { "OrionLogManager" } else { $Product.ToUpper() })',
+    productToInstall: '$(Get-ProductToInstall $Product)',
     productFull: '$($ProductNames[$Product])', 
     productUpper: '$($Product.ToUpper())', 
     additionalDatabase: '$(if($Product -eq "nta" -or $Product -eq "la") { "true" } else {"false" })',

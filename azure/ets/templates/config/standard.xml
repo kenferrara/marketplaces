@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SilentConfig>
   <InstallerConfiguration>
-    <ProductsToInstall>ETS</ProductsToInstall>
+    <ProductsToInstall>ToolsetWeb</ProductsToInstall>
     <AdvancedInstallMode>True</AdvancedInstallMode>
     <SkipConfigurationWizardRun>False</SkipConfigurationWizardRun>
   </InstallerConfiguration>

@@ -57,7 +57,7 @@
         },
         "publicIpAddressName": {
             "type": "string",
-            "defaultValue": "[concat('pip-', parameters('virtualMachineName'), '-', resourceGroup().location)]",
+            "defaultValue": "[concat('pip-', parameters('virtualMachineName'), '-', parameters('location'))]",
             "metadata": {
                 "description": "Public IP Address Name for the VM"
             }
@@ -311,9 +311,9 @@
             "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -402,7 +402,7 @@
                         "displayName": "Database"
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
+                        "[resourceId('Microsoft.Sql/servers/', parameters('dbServerName'))]"
                     ],
                     "properties": {
                         "collation": "SQL_Latin1_General_CP1_CI_AS"
@@ -419,7 +419,7 @@
                     "apiVersion": "2019-06-01-preview",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]"
+                        "[resourceId('Microsoft.Sql/servers/', parameters('dbServerName'))]"
                     ],
                     "properties": {
                         "endIpAddress": "0.0.0.0",
@@ -434,8 +434,8 @@
             "apiVersion": "2019-12-01",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-                "[concat('Microsoft.Sql/servers/', parameters('dbServerName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[resourceId('Microsoft.Sql/servers/', parameters('dbServerName'))]",
                 "[parameters('databaseName')]"
             ],
             "properties": {
@@ -481,7 +481,7 @@
                     "name": "machine-setup",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                        "[resourceId('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
                     ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",
@@ -509,7 +509,7 @@
                     "name": "config-app",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]",
+                        "[resourceId('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]",
                         "machine-setup"
                     ],
                     "tags": {
@@ -532,7 +532,7 @@
                                 ,'\" -dbServerName '
                                     , if(equals(parameters('provisionSqlServer'), bool('false'))
                                         , parameters('dbServerName')
-                                        , reference(resourceId(resourceGroup().name, 'Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
+                                        , reference(resourceId('Microsoft.SQL/servers', parameters('dbServerName')), '2019-06-01-preview').fullyQualifiedDomainName)
                                 ,' -databaseName ',parameters('databaseName')
                                 ,' -dbUserName ',parameters('dbUserName')
                                 ,' -dbPassword ',parameters('dbPassword')
